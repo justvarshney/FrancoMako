@@ -80,7 +80,11 @@ static int f2fs_vm_page_mkwrite(struct vm_area_struct *vma,
 	trace_f2fs_vm_page_mkwrite(page, DATA);
 mapped:
 	/* fill the page */
+<<<<<<< HEAD
 	f2fs_wait_on_page_writeback(page, DATA);
+=======
+	wait_on_page_writeback(page);
+>>>>>>> 29f8554... F2FS Initial
 out:
 	return block_page_mkwrite_return(err);
 }
@@ -113,12 +117,19 @@ static int get_parent_ino(struct inode *inode, nid_t *pino)
 int f2fs_sync_file(struct file *file, loff_t start, loff_t end, int datasync)
 {
 	struct inode *inode = file->f_mapping->host;
+<<<<<<< HEAD
 	struct f2fs_inode_info *fi = F2FS_I(inode);
+=======
+>>>>>>> 29f8554... F2FS Initial
 	struct f2fs_sb_info *sbi = F2FS_SB(inode->i_sb);
 	int ret = 0;
 	bool need_cp = false;
 	struct writeback_control wbc = {
+<<<<<<< HEAD
 		.sync_mode = WB_SYNC_ALL,
+=======
+		.sync_mode = WB_SYNC_NONE,
+>>>>>>> 29f8554... F2FS Initial
 		.nr_to_write = LONG_MAX,
 		.for_reclaim = 0,
 	};
@@ -136,7 +147,11 @@ int f2fs_sync_file(struct file *file, loff_t start, loff_t end, int datasync)
 	/* guarantee free sections for fsync */
 	f2fs_balance_fs(sbi);
 
+<<<<<<< HEAD
 	down_read(&fi->i_sem);
+=======
+	mutex_lock(&inode->i_mutex);
+>>>>>>> 29f8554... F2FS Initial
 
 	/*
 	 * Both of fdatasync() and fsync() are able to be recovered from
@@ -153,6 +168,7 @@ int f2fs_sync_file(struct file *file, loff_t start, loff_t end, int datasync)
 	else if (F2FS_I(inode)->xattr_ver == cur_cp_version(F2FS_CKPT(sbi)))
 		need_cp = true;
 
+<<<<<<< HEAD
 	up_read(&fi->i_sem);
 
 	if (need_cp) {
@@ -163,23 +179,41 @@ int f2fs_sync_file(struct file *file, loff_t start, loff_t end, int datasync)
 
 		down_write(&fi->i_sem);
 		F2FS_I(inode)->xattr_ver = 0;
+=======
+	if (need_cp) {
+		nid_t pino;
+
+		F2FS_I(inode)->xattr_ver = 0;
+
+		/* all the dirty node pages should be flushed for POR */
+		ret = f2fs_sync_fs(inode->i_sb, 1);
+>>>>>>> 29f8554... F2FS Initial
 		if (file_wrong_pino(inode) && inode->i_nlink == 1 &&
 					get_parent_ino(inode, &pino)) {
 			F2FS_I(inode)->i_pino = pino;
 			file_got_pino(inode);
+<<<<<<< HEAD
 			up_write(&fi->i_sem);
+=======
+>>>>>>> 29f8554... F2FS Initial
 			mark_inode_dirty_sync(inode);
 			ret = f2fs_write_inode(inode, NULL);
 			if (ret)
 				goto out;
+<<<<<<< HEAD
 		} else {
 			up_write(&fi->i_sem);
+=======
+>>>>>>> 29f8554... F2FS Initial
 		}
 	} else {
 		/* if there is no written node page, write its inode page */
 		while (!sync_node_pages(sbi, inode->i_ino, &wbc)) {
+<<<<<<< HEAD
 			if (fsync_mark_done(sbi, inode->i_ino))
 				goto out;
+=======
+>>>>>>> 29f8554... F2FS Initial
 			mark_inode_dirty_sync(inode);
 			ret = f2fs_write_inode(inode, NULL);
 			if (ret)
@@ -188,9 +222,16 @@ int f2fs_sync_file(struct file *file, loff_t start, loff_t end, int datasync)
 		ret = wait_on_node_pages_writeback(sbi, inode->i_ino);
 		if (ret)
 			goto out;
+<<<<<<< HEAD
 		ret = f2fs_issue_flush(F2FS_SB(inode->i_sb));
 	}
 out:
+=======
+		ret = blkdev_issue_flush(inode->i_sb->s_bdev, GFP_KERNEL, NULL);
+	}
+out:
+	mutex_unlock(&inode->i_mutex);
+>>>>>>> 29f8554... F2FS Initial
 	trace_f2fs_sync_file_exit(inode, need_cp, datasync, ret);
 	return ret;
 }
@@ -255,7 +296,11 @@ static void truncate_partial_data_page(struct inode *inode, u64 from)
 		f2fs_put_page(page, 1);
 		return;
 	}
+<<<<<<< HEAD
 	f2fs_wait_on_page_writeback(page, DATA);
+=======
+	wait_on_page_writeback(page);
+>>>>>>> 29f8554... F2FS Initial
 	zero_user(page, offset, PAGE_CACHE_SIZE - offset);
 	set_page_dirty(page);
 	f2fs_put_page(page, 1);
@@ -445,7 +490,11 @@ static void fill_zero(struct inode *inode, pgoff_t index,
 	f2fs_unlock_op(sbi);
 
 	if (!IS_ERR(page)) {
+<<<<<<< HEAD
 		f2fs_wait_on_page_writeback(page, DATA);
+=======
+		wait_on_page_writeback(page);
+>>>>>>> 29f8554... F2FS Initial
 		zero_user(page, start, len);
 		set_page_dirty(page);
 		f2fs_put_page(page, 1);
@@ -583,8 +632,11 @@ static long f2fs_fallocate(struct file *file, int mode,
 	if (mode & ~(FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE))
 		return -EOPNOTSUPP;
 
+<<<<<<< HEAD
 	mutex_lock(&inode->i_mutex);
 
+=======
+>>>>>>> 29f8554... F2FS Initial
 	if (mode & FALLOC_FL_PUNCH_HOLE)
 		ret = punch_hole(inode, offset, len);
 	else
@@ -594,9 +646,12 @@ static long f2fs_fallocate(struct file *file, int mode,
 		inode->i_mtime = inode->i_ctime = CURRENT_TIME;
 		mark_inode_dirty(inode);
 	}
+<<<<<<< HEAD
 
 	mutex_unlock(&inode->i_mutex);
 
+=======
+>>>>>>> 29f8554... F2FS Initial
 	trace_f2fs_fallocate(inode, mode, offset, len, ret);
 	return ret;
 }

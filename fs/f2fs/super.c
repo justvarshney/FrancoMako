@@ -55,7 +55,10 @@ enum {
 	Opt_err_panic,
 	Opt_err_recover,
 	Opt_inline_data,
+<<<<<<< HEAD
 	Opt_flush_merge,
+=======
+>>>>>>> 29f8554... F2FS Initial
 	Opt_err,
 };
 
@@ -76,7 +79,10 @@ static match_table_t f2fs_tokens = {
 	{Opt_err_panic, "errors=panic"},
 	{Opt_err_recover, "errors=recover"},
 	{Opt_inline_data, "inline_data"},
+<<<<<<< HEAD
 	{Opt_flush_merge, "flush_merge"},
+=======
+>>>>>>> 29f8554... F2FS Initial
 	{Opt_err, NULL},
 };
 
@@ -84,7 +90,10 @@ static match_table_t f2fs_tokens = {
 enum {
 	GC_THREAD,	/* struct f2fs_gc_thread */
 	SM_INFO,	/* struct f2fs_sm_info */
+<<<<<<< HEAD
 	NM_INFO,	/* struct f2fs_nm_info */
+=======
+>>>>>>> 29f8554... F2FS Initial
 	F2FS_SBI,	/* struct f2fs_sb_info */
 };
 
@@ -103,8 +112,11 @@ static unsigned char *__struct_ptr(struct f2fs_sb_info *sbi, int struct_type)
 		return (unsigned char *)sbi->gc_thread;
 	else if (struct_type == SM_INFO)
 		return (unsigned char *)SM_I(sbi);
+<<<<<<< HEAD
 	else if (struct_type == NM_INFO)
 		return (unsigned char *)NM_I(sbi);
+=======
+>>>>>>> 29f8554... F2FS Initial
 	else if (struct_type == F2FS_SBI)
 		return (unsigned char *)sbi;
 	return NULL;
@@ -196,9 +208,13 @@ F2FS_RW_ATTR(SM_INFO, f2fs_sm_info, reclaim_segments, rec_prefree_segments);
 F2FS_RW_ATTR(SM_INFO, f2fs_sm_info, max_small_discards, max_discards);
 F2FS_RW_ATTR(SM_INFO, f2fs_sm_info, ipu_policy, ipu_policy);
 F2FS_RW_ATTR(SM_INFO, f2fs_sm_info, min_ipu_util, min_ipu_util);
+<<<<<<< HEAD
 F2FS_RW_ATTR(NM_INFO, f2fs_nm_info, ram_thresh, ram_thresh);
 F2FS_RW_ATTR(F2FS_SBI, f2fs_sb_info, max_victim_search, max_victim_search);
 F2FS_RW_ATTR(F2FS_SBI, f2fs_sb_info, dir_level, dir_level);
+=======
+F2FS_RW_ATTR(F2FS_SBI, f2fs_sb_info, max_victim_search, max_victim_search);
+>>>>>>> 29f8554... F2FS Initial
 
 #define ATTR_LIST(name) (&f2fs_attr_##name.attr)
 static struct attribute *f2fs_attrs[] = {
@@ -211,8 +227,11 @@ static struct attribute *f2fs_attrs[] = {
 	ATTR_LIST(ipu_policy),
 	ATTR_LIST(min_ipu_util),
 	ATTR_LIST(max_victim_search),
+<<<<<<< HEAD
 	ATTR_LIST(dir_level),
 	ATTR_LIST(ram_thresh),
+=======
+>>>>>>> 29f8554... F2FS Initial
 	NULL,
 };
 
@@ -307,9 +326,15 @@ static int parse_options(struct super_block *sb, char *options)
 
 			if (!name)
 				return -ENOMEM;
+<<<<<<< HEAD
 			if (strlen(name) == 2 && !strncmp(name, "on", 2))
 				set_opt(sbi, BG_GC);
 			else if (strlen(name) == 3 && !strncmp(name, "off", 3))
+=======
+			if (!strncmp(name, "on", 2))
+				set_opt(sbi, BG_GC);
+			else if (!strncmp(name, "off", 3))
+>>>>>>> 29f8554... F2FS Initial
 				clear_opt(sbi, BG_GC);
 			else {
 				kfree(name);
@@ -405,9 +430,12 @@ static int parse_options(struct super_block *sb, char *options)
 		case Opt_inline_data:
 			set_opt(sbi, INLINE_DATA);
 			break;
+<<<<<<< HEAD
 		case Opt_flush_merge:
 			set_opt(sbi, FLUSH_MERGE);
 			break;
+=======
+>>>>>>> 29f8554... F2FS Initial
 		default:
 			f2fs_msg(sb, KERN_ERR,
 				"Unrecognized mount option \"%s\" or missing value",
@@ -434,16 +462,22 @@ static struct inode *f2fs_alloc_inode(struct super_block *sb)
 	fi->i_current_depth = 1;
 	fi->i_advise = 0;
 	rwlock_init(&fi->ext.ext_lock);
+<<<<<<< HEAD
 	init_rwsem(&fi->i_sem);
+=======
+>>>>>>> 29f8554... F2FS Initial
 
 	set_inode_flag(fi, FI_NEW_INODE);
 
 	if (test_opt(F2FS_SB(sb), INLINE_XATTR))
 		set_inode_flag(fi, FI_INLINE_XATTR);
 
+<<<<<<< HEAD
 	/* Will be used by directory only */
 	fi->i_dir_level = F2FS_SB(sb)->dir_level;
 
+=======
+>>>>>>> 29f8554... F2FS Initial
 	return &fi->vfs_inode;
 }
 
@@ -567,7 +601,11 @@ static int f2fs_show_options(struct seq_file *seq, struct dentry *root)
 {
 	struct f2fs_sb_info *sbi = F2FS_SB(root->d_sb);
 
+<<<<<<< HEAD
 	if (!f2fs_readonly(sbi->sb) && test_opt(sbi, BG_GC))
+=======
+	if (!(root->d_sb->s_flags & MS_RDONLY) && test_opt(sbi, BG_GC))
+>>>>>>> 29f8554... F2FS Initial
 		seq_printf(seq, ",background_gc=%s", "on");
 	else
 		seq_printf(seq, ",background_gc=%s", "off");
@@ -611,8 +649,11 @@ static int f2fs_show_options(struct seq_file *seq, struct dentry *root)
 
 	if (test_opt(sbi, INLINE_DATA))
 		seq_puts(seq, ",inline_data");
+<<<<<<< HEAD
 	if (!f2fs_readonly(sbi->sb) && test_opt(sbi, FLUSH_MERGE))
 		seq_puts(seq, ",flush_merge");
+=======
+>>>>>>> 29f8554... F2FS Initial
 	seq_printf(seq, ",active_logs=%u", sbi->active_logs);
 
 	return 0;
@@ -626,6 +667,7 @@ static int segment_info_seq_show(struct seq_file *seq, void *offset)
 			le32_to_cpu(sbi->raw_super->segment_count_main);
 	int i;
 
+<<<<<<< HEAD
 	seq_puts(seq, "format: segment_type|valid_blocks\n"
 		"segment_type(0:HD, 1:WD, 2:CD, 3:HN, 4:WN, 5:CN)\n");
 
@@ -642,6 +684,15 @@ static int segment_info_seq_show(struct seq_file *seq, void *offset)
 			seq_putc(seq, ' ');
 	}
 
+=======
+	for (i = 0; i < total_segs; i++) {
+		seq_printf(seq, "%u", get_valid_blocks(sbi, i, 1));
+		if (i != 0 && (i % 10) == 0)
+			seq_puts(seq, "\n");
+		else
+			seq_puts(seq, " ");
+	}
+>>>>>>> 29f8554... F2FS Initial
 	return 0;
 }
 
@@ -664,8 +715,11 @@ static int f2fs_remount(struct super_block *sb, int *flags, char *data)
 	struct f2fs_sb_info *sbi = F2FS_SB(sb);
 	struct f2fs_mount_info org_mount_opt;
 	int err, active_logs;
+<<<<<<< HEAD
 	bool need_restart_gc = false;
 	bool need_stop_gc = false;
+=======
+>>>>>>> 29f8554... F2FS Initial
 
 	/*
 	 * Save the old mount options in case we
@@ -681,7 +735,11 @@ static int f2fs_remount(struct super_block *sb, int *flags, char *data)
 
 	/*
 	 * Previous and new state of filesystem is RO,
+<<<<<<< HEAD
 	 * so skip checking GC and FLUSH_MERGE conditions.
+=======
+	 * so no point in checking GC conditions.
+>>>>>>> 29f8554... F2FS Initial
 	 */
 	if ((sb->s_flags & MS_RDONLY) && (*flags & MS_RDONLY))
 		goto skip;
@@ -695,12 +753,16 @@ static int f2fs_remount(struct super_block *sb, int *flags, char *data)
 		if (sbi->gc_thread) {
 			stop_gc_thread(sbi);
 			f2fs_sync_fs(sb, 1);
+<<<<<<< HEAD
 			need_restart_gc = true;
+=======
+>>>>>>> 29f8554... F2FS Initial
 		}
 	} else if (test_opt(sbi, BG_GC) && !sbi->gc_thread) {
 		err = start_gc_thread(sbi);
 		if (err)
 			goto restore_opts;
+<<<<<<< HEAD
 		need_stop_gc = true;
 	}
 
@@ -732,12 +794,15 @@ static int f2fs_remount(struct super_block *sb, int *flags, char *data)
 				goto restore_gc;
 			}
 		}
+=======
+>>>>>>> 29f8554... F2FS Initial
 	}
 skip:
 	/* Update the POSIXACL Flag */
 	 sb->s_flags = (sb->s_flags & ~MS_POSIXACL) |
 		(test_opt(sbi, POSIX_ACL) ? MS_POSIXACL : 0);
 	return 0;
+<<<<<<< HEAD
 restore_gc:
 	if (need_restart_gc) {
 		if (start_gc_thread(sbi))
@@ -746,6 +811,9 @@ restore_gc:
 	} else if (need_stop_gc) {
 		stop_gc_thread(sbi);
 	}
+=======
+
+>>>>>>> 29f8554... F2FS Initial
 restore_opts:
 	sbi->mount_opt = org_mount_opt;
 	sbi->active_logs = active_logs;
@@ -774,8 +842,11 @@ static struct inode *f2fs_nfs_get_inode(struct super_block *sb,
 
 	if (unlikely(ino < F2FS_ROOT_INO(sbi)))
 		return ERR_PTR(-ESTALE);
+<<<<<<< HEAD
 	if (unlikely(ino >= NM_I(sbi)->max_nid))
 		return ERR_PTR(-ESTALE);
+=======
+>>>>>>> 29f8554... F2FS Initial
 
 	/*
 	 * f2fs_iget isn't quite right if the inode is currently unallocated!
@@ -923,8 +994,11 @@ static void init_sb_info(struct f2fs_sb_info *sbi)
 
 	for (i = 0; i < NR_COUNT_TYPE; i++)
 		atomic_set(&sbi->nr_pages[i], 0);
+<<<<<<< HEAD
 
 	sbi->dir_level = DEF_DIR_LEVEL;
+=======
+>>>>>>> 29f8554... F2FS Initial
 }
 
 /*
@@ -1038,11 +1112,19 @@ static int f2fs_fill_super(struct super_block *sb, void *data, int silent)
 	sbi->por_doing = false;
 	spin_lock_init(&sbi->stat_lock);
 
+<<<<<<< HEAD
 	init_rwsem(&sbi->read_io.io_rwsem);
 	sbi->read_io.sbi = sbi;
 	sbi->read_io.bio = NULL;
 	for (i = 0; i < NR_PAGE_TYPE; i++) {
 		init_rwsem(&sbi->write_io[i].io_rwsem);
+=======
+	mutex_init(&sbi->read_io.io_mutex);
+	sbi->read_io.sbi = sbi;
+	sbi->read_io.bio = NULL;
+	for (i = 0; i < NR_PAGE_TYPE; i++) {
+		mutex_init(&sbi->write_io[i].io_mutex);
+>>>>>>> 29f8554... F2FS Initial
 		sbi->write_io[i].sbi = sbi;
 		sbi->write_io[i].bio = NULL;
 	}
@@ -1059,6 +1141,10 @@ static int f2fs_fill_super(struct super_block *sb, void *data, int silent)
 		goto free_sb_buf;
 	}
 
+<<<<<<< HEAD
+=======
+get_cp:
+>>>>>>> 29f8554... F2FS Initial
 	err = get_valid_checkpoint(sbi);
 	if (err) {
 		f2fs_msg(sb, KERN_ERR, "Failed to get valid F2FS checkpoint");
@@ -1131,9 +1217,44 @@ static int f2fs_fill_super(struct super_block *sb, void *data, int silent)
 		goto free_root_inode;
 	}
 
+<<<<<<< HEAD
 	err = f2fs_build_stats(sbi);
 	if (err)
 		goto free_root_inode;
+=======
+	/* recover fsynced data */
+	if (!test_opt(sbi, DISABLE_ROLL_FORWARD)) {
+		err = recover_fsync_data(sbi);
+		if (err) {
+			if (f2fs_handle_error(sbi)) {
+				set_opt(sbi, DISABLE_ROLL_FORWARD);
+				kfree(sbi->ckpt);
+				f2fs_msg(sb, KERN_ERR,
+					"reloading last checkpoint");
+				goto get_cp;
+			}
+			f2fs_msg(sb, KERN_ERR,
+				"cannot recover all fsync data errno=%ld", err);
+			/* checkpoint what we have */
+			write_checkpoint(sbi, false);
+		}
+	}
+
+	/*
+	 * If filesystem is not mounted as read-only then
+	 * do start the gc_thread.
+	 */
+	if (!(sb->s_flags & MS_RDONLY)) {
+		/* After POR, we can run background GC thread.*/
+		err = start_gc_thread(sbi);
+		if (err)
+			goto free_gc;
+	}
+
+	err = f2fs_build_stats(sbi);
+	if (err)
+		goto free_gc;
+>>>>>>> 29f8554... F2FS Initial
 
 	if (f2fs_proc_root)
 		sbi->s_proc = proc_mkdir(sb->s_id, f2fs_proc_root);
@@ -1159,6 +1280,7 @@ static int f2fs_fill_super(struct super_block *sb, void *data, int silent)
 	err = kobject_init_and_add(&sbi->s_kobj, &f2fs_ktype, NULL,
 							"%s", sb->s_id);
 	if (err)
+<<<<<<< HEAD
 		goto free_proc;
 
 	/* recover fsynced data */
@@ -1184,11 +1306,22 @@ static int f2fs_fill_super(struct super_block *sb, void *data, int silent)
 free_kobj:
 	kobject_del(&sbi->s_kobj);
 free_proc:
+=======
+		goto fail;
+
+	return 0;
+fail:
+>>>>>>> 29f8554... F2FS Initial
 	if (sbi->s_proc) {
 		remove_proc_entry("segment_info", sbi->s_proc);
 		remove_proc_entry(sb->s_id, f2fs_proc_root);
 	}
 	f2fs_destroy_stats(sbi);
+<<<<<<< HEAD
+=======
+free_gc:
+	stop_gc_thread(sbi);
+>>>>>>> 29f8554... F2FS Initial
 free_root_inode:
 	dput(sb->s_root);
 	sb->s_root = NULL;
@@ -1228,7 +1361,11 @@ static struct file_system_type f2fs_fs_type = {
 static int __init init_inodecache(void)
 {
 	f2fs_inode_cachep = f2fs_kmem_cache_create("f2fs_inode_cache",
+<<<<<<< HEAD
 			sizeof(struct f2fs_inode_info));
+=======
+			sizeof(struct f2fs_inode_info), NULL);
+>>>>>>> 29f8554... F2FS Initial
 	if (!f2fs_inode_cachep)
 		return -ENOMEM;
 	return 0;

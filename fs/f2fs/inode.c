@@ -12,7 +12,10 @@
 #include <linux/f2fs_fs.h>
 #include <linux/buffer_head.h>
 #include <linux/writeback.h>
+<<<<<<< HEAD
 #include <linux/bitops.h>
+=======
+>>>>>>> 29f8554... F2FS Initial
 
 #include "f2fs.h"
 #include "node.h"
@@ -22,6 +25,7 @@
 void f2fs_set_inode_flags(struct inode *inode)
 {
 	unsigned int flags = F2FS_I(inode)->i_flags;
+<<<<<<< HEAD
 	unsigned int new_fl = 0;
 
 	if (flags & FS_SYNC_FL)
@@ -36,6 +40,22 @@ void f2fs_set_inode_flags(struct inode *inode)
 		new_fl |= S_DIRSYNC;
 	set_mask_bits(&inode->i_flags,
 			S_SYNC|S_APPEND|S_IMMUTABLE|S_NOATIME|S_DIRSYNC, new_fl);
+=======
+
+	inode->i_flags &= ~(S_SYNC | S_APPEND | S_IMMUTABLE |
+			S_NOATIME | S_DIRSYNC);
+
+	if (flags & FS_SYNC_FL)
+		inode->i_flags |= S_SYNC;
+	if (flags & FS_APPEND_FL)
+		inode->i_flags |= S_APPEND;
+	if (flags & FS_IMMUTABLE_FL)
+		inode->i_flags |= S_IMMUTABLE;
+	if (flags & FS_NOATIME_FL)
+		inode->i_flags |= S_NOATIME;
+	if (flags & FS_DIRSYNC_FL)
+		inode->i_flags |= S_DIRSYNC;
+>>>>>>> 29f8554... F2FS Initial
 }
 
 static void __get_inode_rdev(struct inode *inode, struct f2fs_inode *ri)
@@ -108,7 +128,10 @@ static int do_read_inode(struct inode *inode)
 	fi->flags = 0;
 	fi->i_advise = ri->i_advise;
 	fi->i_pino = le32_to_cpu(ri->i_pino);
+<<<<<<< HEAD
 	fi->i_dir_level = ri->i_dir_level;
+=======
+>>>>>>> 29f8554... F2FS Initial
 
 	get_extent_info(&fi->ext, ri->i_ext);
 	get_inline_info(fi, ri);
@@ -206,7 +229,10 @@ void update_inode(struct inode *inode, struct page *node_page)
 	ri->i_flags = cpu_to_le32(F2FS_I(inode)->i_flags);
 	ri->i_pino = cpu_to_le32(F2FS_I(inode)->i_pino);
 	ri->i_generation = cpu_to_le32(inode->i_generation);
+<<<<<<< HEAD
 	ri->i_dir_level = F2FS_I(inode)->i_dir_level;
+=======
+>>>>>>> 29f8554... F2FS Initial
 
 	__set_inode_rdev(inode, ri);
 	set_cold_node(inode, node_page);
@@ -274,7 +300,11 @@ void f2fs_evict_inode(struct inode *inode)
 			inode->i_ino == F2FS_META_INO(sbi))
 		goto no_delete;
 
+<<<<<<< HEAD
 	f2fs_bug_on(get_dirty_dents(inode));
+=======
+	f2fs_bug_on(atomic_read(&F2FS_I(inode)->dirty_dents));
+>>>>>>> 29f8554... F2FS Initial
 	remove_dirty_dir_inode(inode);
 
 	if (inode->i_nlink || is_bad_inode(inode))

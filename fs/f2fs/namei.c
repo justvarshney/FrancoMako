@@ -212,8 +212,11 @@ static struct dentry *f2fs_lookup(struct inode *dir, struct dentry *dentry,
 		inode = f2fs_iget(dir->i_sb, ino);
 		if (IS_ERR(inode))
 			return ERR_CAST(inode);
+<<<<<<< HEAD
 
 		stat_inc_inline_inode(inode);
+=======
+>>>>>>> 29f8554... F2FS Initial
 	}
 
 	return d_splice_alias(inode, dentry);
@@ -431,6 +434,7 @@ static int f2fs_rename(struct inode *old_dir, struct dentry *old_dentry,
 		}
 
 		f2fs_set_link(new_dir, new_entry, new_page, old_inode);
+<<<<<<< HEAD
 		down_write(&F2FS_I(old_inode)->i_sem);
 		F2FS_I(old_inode)->i_pino = new_dir->i_ino;
 		up_write(&F2FS_I(old_inode)->i_sem);
@@ -442,6 +446,14 @@ static int f2fs_rename(struct inode *old_dir, struct dentry *old_dentry,
 		drop_nlink(new_inode);
 		up_write(&F2FS_I(new_inode)->i_sem);
 
+=======
+		F2FS_I(old_inode)->i_pino = new_dir->i_ino;
+
+		new_inode->i_ctime = CURRENT_TIME;
+		if (old_dir_entry)
+			drop_nlink(new_inode);
+		drop_nlink(new_inode);
+>>>>>>> 29f8554... F2FS Initial
 		mark_inode_dirty(new_inode);
 
 		if (!new_inode->i_nlink)
@@ -471,9 +483,13 @@ static int f2fs_rename(struct inode *old_dir, struct dentry *old_dentry,
 		if (old_dir != new_dir) {
 			f2fs_set_link(old_inode, old_dir_entry,
 						old_dir_page, new_dir);
+<<<<<<< HEAD
 			down_write(&F2FS_I(old_inode)->i_sem);
 			F2FS_I(old_inode)->i_pino = new_dir->i_ino;
 			up_write(&F2FS_I(old_inode)->i_sem);
+=======
+			F2FS_I(old_inode)->i_pino = new_dir->i_ino;
+>>>>>>> 29f8554... F2FS Initial
 			update_inode_page(old_inode);
 		} else {
 			kunmap(old_dir_page);
