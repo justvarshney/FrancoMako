@@ -28,6 +28,7 @@ static struct fsync_inode_entry *get_fsync_inode(struct list_head *head,
 								nid_t ino)
 {
 <<<<<<< HEAD
+<<<<<<< HEAD
 	struct fsync_inode_entry *entry;
 
 	list_for_each_entry(entry, head, list)
@@ -36,14 +37,19 @@ static struct fsync_inode_entry *get_fsync_inode(struct list_head *head,
 
 =======
 	struct list_head *this;
+=======
+>>>>>>> 21c37c1... F2FS: latest commits
 	struct fsync_inode_entry *entry;
 
-	list_for_each(this, head) {
-		entry = list_entry(this, struct fsync_inode_entry, list);
+	list_for_each_entry(entry, head, list)
 		if (entry->inode->i_ino == ino)
 			return entry;
+<<<<<<< HEAD
 	}
 >>>>>>> 29f8554... F2FS Initial
+=======
+
+>>>>>>> 21c37c1... F2FS: latest commits
 	return NULL;
 }
 
@@ -58,6 +64,9 @@ static int recover_dentry(struct page *ipage, struct inode *inode)
 	int err = 0;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 21c37c1... F2FS: latest commits
 	dir = f2fs_iget(inode->i_sb, pino);
 	if (IS_ERR(dir)) {
 		err = PTR_ERR(dir);
@@ -67,6 +76,7 @@ static int recover_dentry(struct page *ipage, struct inode *inode)
 	if (is_inode_flag_set(F2FS_I(dir), FI_DIRTY_DIR)) {
 		iput(dir);
 	} else {
+<<<<<<< HEAD
 		add_dirty_dir_inode(dir);
 		set_inode_flag(F2FS_I(dir), FI_DELAY_IPUT);
 =======
@@ -83,6 +93,10 @@ static int recover_dentry(struct page *ipage, struct inode *inode)
 		set_inode_flag(F2FS_I(dir), FI_DELAY_IPUT);
 		add_dirty_dir_inode(dir);
 >>>>>>> 29f8554... F2FS Initial
+=======
+		add_dirty_dir_inode(dir);
+		set_inode_flag(F2FS_I(dir), FI_DELAY_IPUT);
+>>>>>>> 21c37c1... F2FS: latest commits
 	}
 
 	name.len = le32_to_cpu(raw_inode->i_namelen);
@@ -163,10 +177,14 @@ static int find_fsync_dnodes(struct f2fs_sb_info *sbi, struct list_head *head)
 	/* get node pages in the current segment */
 	curseg = CURSEG_I(sbi, CURSEG_WARM_NODE);
 <<<<<<< HEAD
+<<<<<<< HEAD
 	blkaddr = NEXT_FREE_BLKADDR(sbi, curseg);
 =======
 	blkaddr = START_BLOCK(sbi, curseg->segno) + curseg->next_blkoff;
 >>>>>>> 29f8554... F2FS Initial
+=======
+	blkaddr = NEXT_FREE_BLKADDR(sbi, curseg);
+>>>>>>> 21c37c1... F2FS: latest commits
 
 	/* read node page */
 	page = alloc_page(GFP_F2FS_ZERO);
@@ -260,6 +278,7 @@ static int check_index_in_prev_nodes(struct f2fs_sb_info *sbi,
 	struct seg_entry *sentry;
 	unsigned int segno = GET_SEGNO(sbi, blkaddr);
 <<<<<<< HEAD
+<<<<<<< HEAD
 	unsigned short blkoff = GET_BLKOFF_FROM_SEG0(sbi, blkaddr);
 	struct f2fs_summary_block *sum_node;
 	struct f2fs_summary sum;
@@ -269,12 +288,19 @@ static int check_index_in_prev_nodes(struct f2fs_sb_info *sbi,
 =======
 	unsigned short blkoff = GET_SEGOFF_FROM_SEG0(sbi, blkaddr) &
 					(sbi->blocks_per_seg - 1);
+=======
+	unsigned short blkoff = GET_BLKOFF_FROM_SEG0(sbi, blkaddr);
+	struct f2fs_summary_block *sum_node;
+>>>>>>> 21c37c1... F2FS: latest commits
 	struct f2fs_summary sum;
+	struct page *sum_page, *node_page;
 	nid_t ino, nid;
-	void *kaddr;
 	struct inode *inode;
+<<<<<<< HEAD
 	struct page *node_page;
 >>>>>>> 29f8554... F2FS Initial
+=======
+>>>>>>> 21c37c1... F2FS: latest commits
 	unsigned int offset;
 	block_t bidx;
 	int i;
@@ -295,6 +321,7 @@ static int check_index_in_prev_nodes(struct f2fs_sb_info *sbi,
 		if (curseg->segno == segno) {
 			sum = curseg->sum_blk->entries[blkoff];
 <<<<<<< HEAD
+<<<<<<< HEAD
 			goto got_it;
 		}
 	}
@@ -306,18 +333,21 @@ static int check_index_in_prev_nodes(struct f2fs_sb_info *sbi,
 got_it:
 =======
 			break;
+=======
+			goto got_it;
+>>>>>>> 21c37c1... F2FS: latest commits
 		}
 	}
-	if (i > CURSEG_COLD_DATA) {
-		struct page *sum_page = get_sum_page(sbi, segno);
-		struct f2fs_summary_block *sum_node;
-		kaddr = page_address(sum_page);
-		sum_node = (struct f2fs_summary_block *)kaddr;
-		sum = sum_node->entries[blkoff];
-		f2fs_put_page(sum_page, 1);
-	}
 
+<<<<<<< HEAD
 >>>>>>> 29f8554... F2FS Initial
+=======
+	sum_page = get_sum_page(sbi, segno);
+	sum_node = (struct f2fs_summary_block *)page_address(sum_page);
+	sum = sum_node->entries[blkoff];
+	f2fs_put_page(sum_page, 1);
+got_it:
+>>>>>>> 21c37c1... F2FS: latest commits
 	/* Use the locked dnode page and inode */
 	nid = le32_to_cpu(sum.nid);
 	if (dn->inode->i_ino == nid) {
@@ -399,10 +429,14 @@ static int do_recover_data(struct f2fs_sb_info *sbi, struct inode *inode,
 	}
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 	f2fs_wait_on_page_writeback(dn.node_page, NODE);
 =======
 	wait_on_page_writeback(dn.node_page);
 >>>>>>> 29f8554... F2FS Initial
+=======
+	f2fs_wait_on_page_writeback(dn.node_page, NODE);
+>>>>>>> 21c37c1... F2FS: latest commits
 
 	get_node_info(sbi, dn.nid, &ni);
 	f2fs_bug_on(ni.ino != ino_of_node(page));
@@ -535,10 +569,14 @@ int recover_fsync_data(struct f2fs_sb_info *sbi)
 
 	fsync_entry_slab = f2fs_kmem_cache_create("f2fs_fsync_inode_entry",
 <<<<<<< HEAD
+<<<<<<< HEAD
 			sizeof(struct fsync_inode_entry));
 =======
 			sizeof(struct fsync_inode_entry), NULL);
 >>>>>>> 29f8554... F2FS Initial
+=======
+			sizeof(struct fsync_inode_entry));
+>>>>>>> 21c37c1... F2FS: latest commits
 	if (!fsync_entry_slab)
 		return -ENOMEM;
 

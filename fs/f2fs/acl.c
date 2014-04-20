@@ -159,10 +159,14 @@ struct posix_acl *f2fs_get_acl(struct inode *inode, int type)
 	retval = f2fs_getxattr(inode, name_index, "", NULL, 0);
 	if (retval > 0) {
 <<<<<<< HEAD
+<<<<<<< HEAD
 		value = kmalloc(retval, GFP_F2FS_ZERO);
 =======
 		value = kmalloc(retval, GFP_KERNEL);
 >>>>>>> 29f8554... F2FS Initial
+=======
+		value = kmalloc(retval, GFP_F2FS_ZERO);
+>>>>>>> 21c37c1... F2FS: latest commits
 		if (!value)
 			return ERR_PTR(-ENOMEM);
 		retval = f2fs_getxattr(inode, name_index, "", value, retval);
@@ -192,14 +196,20 @@ static int __f2fs_set_acl(struct inode *inode, int type,
 	int error;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 21c37c1... F2FS: latest commits
 	if (acl) {
 		error = posix_acl_valid(acl);
 		if (error < 0)
 			return error;
 	}
 
+<<<<<<< HEAD
 =======
 >>>>>>> 29f8554... F2FS Initial
+=======
+>>>>>>> 21c37c1... F2FS: latest commits
 	switch (type) {
 	case ACL_TYPE_ACCESS:
 		name_index = F2FS_XATTR_INDEX_POSIX_ACL_ACCESS;

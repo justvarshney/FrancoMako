@@ -15,10 +15,14 @@
 #define NULL_SECNO			((unsigned int)(~0))
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 #define DEF_RECLAIM_PREFREE_SEGMENTS	5	/* 5% over total segments */
 =======
 #define DEF_RECLAIM_PREFREE_SEGMENTS	100	/* 200MB of prefree segments */
 >>>>>>> 29f8554... F2FS Initial
+=======
+#define DEF_RECLAIM_PREFREE_SEGMENTS	5	/* 5% over total segments */
+>>>>>>> 21c37c1... F2FS: latest commits
 
 /* L: Logical segment # in volume, R: Relative segment # in main area */
 #define GET_L2R_SEGNO(free_i, segno)	(segno - free_i->start_segno)
@@ -62,11 +66,17 @@
 #define GET_SEGNO_FROM_SEG0(sbi, blk_addr)				\
 	(GET_SEGOFF_FROM_SEG0(sbi, blk_addr) >> sbi->log_blocks_per_seg)
 <<<<<<< HEAD
+<<<<<<< HEAD
 #define GET_BLKOFF_FROM_SEG0(sbi, blk_addr)				\
 	(GET_SEGOFF_FROM_SEG0(sbi, blk_addr) & (sbi->blocks_per_seg - 1))
 
 =======
 >>>>>>> 29f8554... F2FS Initial
+=======
+#define GET_BLKOFF_FROM_SEG0(sbi, blk_addr)				\
+	(GET_SEGOFF_FROM_SEG0(sbi, blk_addr) & (sbi->blocks_per_seg - 1))
+
+>>>>>>> 21c37c1... F2FS: latest commits
 #define GET_SEGNO(sbi, blk_addr)					\
 	(((blk_addr == NULL_ADDR) || (blk_addr == NEW_ADDR)) ?		\
 	NULL_SEGNO : GET_L2R_SEGNO(FREE_I(sbi),			\
@@ -388,6 +398,7 @@ static inline void get_sit_bitmap(struct f2fs_sb_info *sbi,
 static inline block_t written_block_count(struct f2fs_sb_info *sbi)
 {
 <<<<<<< HEAD
+<<<<<<< HEAD
 	return SIT_I(sbi)->written_valid_blocks;
 =======
 	struct sit_info *sit_i = SIT_I(sbi);
@@ -399,10 +410,14 @@ static inline block_t written_block_count(struct f2fs_sb_info *sbi)
 
 	return vblocks;
 >>>>>>> 29f8554... F2FS Initial
+=======
+	return SIT_I(sbi)->written_valid_blocks;
+>>>>>>> 21c37c1... F2FS: latest commits
 }
 
 static inline unsigned int free_segments(struct f2fs_sb_info *sbi)
 {
+<<<<<<< HEAD
 <<<<<<< HEAD
 	return FREE_I(sbi)->free_segments;
 =======
@@ -415,6 +430,9 @@ static inline unsigned int free_segments(struct f2fs_sb_info *sbi)
 
 	return free_segs;
 >>>>>>> 29f8554... F2FS Initial
+=======
+	return FREE_I(sbi)->free_segments;
+>>>>>>> 21c37c1... F2FS: latest commits
 }
 
 static inline int reserved_segments(struct f2fs_sb_info *sbi)
@@ -424,6 +442,7 @@ static inline int reserved_segments(struct f2fs_sb_info *sbi)
 
 static inline unsigned int free_sections(struct f2fs_sb_info *sbi)
 {
+<<<<<<< HEAD
 <<<<<<< HEAD
 	return FREE_I(sbi)->free_sections;
 =======
@@ -436,6 +455,9 @@ static inline unsigned int free_sections(struct f2fs_sb_info *sbi)
 
 	return free_secs;
 >>>>>>> 29f8554... F2FS Initial
+=======
+	return FREE_I(sbi)->free_sections;
+>>>>>>> 21c37c1... F2FS: latest commits
 }
 
 static inline unsigned int prefree_segments(struct f2fs_sb_info *sbi)
@@ -705,6 +727,9 @@ static inline unsigned int max_hw_blocks(struct f2fs_sb_info *sbi)
 	return SECTOR_TO_BLOCK(sbi, queue_max_sectors(q));
 }
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 21c37c1... F2FS: latest commits
 
 /*
  * It is very important to gather dirty pages and write at once, so that we can
@@ -748,5 +773,8 @@ static inline long nr_pages_to_write(struct f2fs_sb_info *sbi, int type,
 	wbc->nr_to_write = desired;
 	return desired - nr_to_write;
 }
+<<<<<<< HEAD
 =======
 >>>>>>> 29f8554... F2FS Initial
+=======
+>>>>>>> 21c37c1... F2FS: latest commits

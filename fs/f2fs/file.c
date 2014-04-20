@@ -81,10 +81,14 @@ static int f2fs_vm_page_mkwrite(struct vm_area_struct *vma,
 mapped:
 	/* fill the page */
 <<<<<<< HEAD
+<<<<<<< HEAD
 	f2fs_wait_on_page_writeback(page, DATA);
 =======
 	wait_on_page_writeback(page);
 >>>>>>> 29f8554... F2FS Initial
+=======
+	f2fs_wait_on_page_writeback(page, DATA);
+>>>>>>> 21c37c1... F2FS: latest commits
 out:
 	return block_page_mkwrite_return(err);
 }
@@ -118,18 +122,26 @@ int f2fs_sync_file(struct file *file, loff_t start, loff_t end, int datasync)
 {
 	struct inode *inode = file->f_mapping->host;
 <<<<<<< HEAD
+<<<<<<< HEAD
 	struct f2fs_inode_info *fi = F2FS_I(inode);
 =======
 >>>>>>> 29f8554... F2FS Initial
+=======
+	struct f2fs_inode_info *fi = F2FS_I(inode);
+>>>>>>> 21c37c1... F2FS: latest commits
 	struct f2fs_sb_info *sbi = F2FS_SB(inode->i_sb);
 	int ret = 0;
 	bool need_cp = false;
 	struct writeback_control wbc = {
 <<<<<<< HEAD
+<<<<<<< HEAD
 		.sync_mode = WB_SYNC_ALL,
 =======
 		.sync_mode = WB_SYNC_NONE,
 >>>>>>> 29f8554... F2FS Initial
+=======
+		.sync_mode = WB_SYNC_ALL,
+>>>>>>> 21c37c1... F2FS: latest commits
 		.nr_to_write = LONG_MAX,
 		.for_reclaim = 0,
 	};
@@ -148,10 +160,14 @@ int f2fs_sync_file(struct file *file, loff_t start, loff_t end, int datasync)
 	f2fs_balance_fs(sbi);
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 	down_read(&fi->i_sem);
 =======
 	mutex_lock(&inode->i_mutex);
 >>>>>>> 29f8554... F2FS Initial
+=======
+	down_read(&fi->i_sem);
+>>>>>>> 21c37c1... F2FS: latest commits
 
 	/*
 	 * Both of fdatasync() and fsync() are able to be recovered from
@@ -169,6 +185,7 @@ int f2fs_sync_file(struct file *file, loff_t start, loff_t end, int datasync)
 		need_cp = true;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 	up_read(&fi->i_sem);
 
 	if (need_cp) {
@@ -180,40 +197,62 @@ int f2fs_sync_file(struct file *file, loff_t start, loff_t end, int datasync)
 		down_write(&fi->i_sem);
 		F2FS_I(inode)->xattr_ver = 0;
 =======
+=======
+	up_read(&fi->i_sem);
+
+>>>>>>> 21c37c1... F2FS: latest commits
 	if (need_cp) {
 		nid_t pino;
 
-		F2FS_I(inode)->xattr_ver = 0;
-
 		/* all the dirty node pages should be flushed for POR */
 		ret = f2fs_sync_fs(inode->i_sb, 1);
+<<<<<<< HEAD
 >>>>>>> 29f8554... F2FS Initial
+=======
+
+		down_write(&fi->i_sem);
+		F2FS_I(inode)->xattr_ver = 0;
+>>>>>>> 21c37c1... F2FS: latest commits
 		if (file_wrong_pino(inode) && inode->i_nlink == 1 &&
 					get_parent_ino(inode, &pino)) {
 			F2FS_I(inode)->i_pino = pino;
 			file_got_pino(inode);
 <<<<<<< HEAD
+<<<<<<< HEAD
 			up_write(&fi->i_sem);
 =======
 >>>>>>> 29f8554... F2FS Initial
+=======
+			up_write(&fi->i_sem);
+>>>>>>> 21c37c1... F2FS: latest commits
 			mark_inode_dirty_sync(inode);
 			ret = f2fs_write_inode(inode, NULL);
 			if (ret)
 				goto out;
 <<<<<<< HEAD
+<<<<<<< HEAD
 		} else {
 			up_write(&fi->i_sem);
 =======
 >>>>>>> 29f8554... F2FS Initial
+=======
+		} else {
+			up_write(&fi->i_sem);
+>>>>>>> 21c37c1... F2FS: latest commits
 		}
 	} else {
 		/* if there is no written node page, write its inode page */
 		while (!sync_node_pages(sbi, inode->i_ino, &wbc)) {
 <<<<<<< HEAD
+<<<<<<< HEAD
 			if (fsync_mark_done(sbi, inode->i_ino))
 				goto out;
 =======
 >>>>>>> 29f8554... F2FS Initial
+=======
+			if (fsync_mark_done(sbi, inode->i_ino))
+				goto out;
+>>>>>>> 21c37c1... F2FS: latest commits
 			mark_inode_dirty_sync(inode);
 			ret = f2fs_write_inode(inode, NULL);
 			if (ret)
@@ -222,6 +261,7 @@ int f2fs_sync_file(struct file *file, loff_t start, loff_t end, int datasync)
 		ret = wait_on_node_pages_writeback(sbi, inode->i_ino);
 		if (ret)
 			goto out;
+<<<<<<< HEAD
 <<<<<<< HEAD
 		ret = f2fs_issue_flush(F2FS_SB(inode->i_sb));
 	}
@@ -232,6 +272,11 @@ out:
 out:
 	mutex_unlock(&inode->i_mutex);
 >>>>>>> 29f8554... F2FS Initial
+=======
+		ret = f2fs_issue_flush(F2FS_SB(inode->i_sb));
+	}
+out:
+>>>>>>> 21c37c1... F2FS: latest commits
 	trace_f2fs_sync_file_exit(inode, need_cp, datasync, ret);
 	return ret;
 }
@@ -297,10 +342,14 @@ static void truncate_partial_data_page(struct inode *inode, u64 from)
 		return;
 	}
 <<<<<<< HEAD
+<<<<<<< HEAD
 	f2fs_wait_on_page_writeback(page, DATA);
 =======
 	wait_on_page_writeback(page);
 >>>>>>> 29f8554... F2FS Initial
+=======
+	f2fs_wait_on_page_writeback(page, DATA);
+>>>>>>> 21c37c1... F2FS: latest commits
 	zero_user(page, offset, PAGE_CACHE_SIZE - offset);
 	set_page_dirty(page);
 	f2fs_put_page(page, 1);
@@ -491,10 +540,14 @@ static void fill_zero(struct inode *inode, pgoff_t index,
 
 	if (!IS_ERR(page)) {
 <<<<<<< HEAD
+<<<<<<< HEAD
 		f2fs_wait_on_page_writeback(page, DATA);
 =======
 		wait_on_page_writeback(page);
 >>>>>>> 29f8554... F2FS Initial
+=======
+		f2fs_wait_on_page_writeback(page, DATA);
+>>>>>>> 21c37c1... F2FS: latest commits
 		zero_user(page, start, len);
 		set_page_dirty(page);
 		f2fs_put_page(page, 1);
@@ -633,10 +686,15 @@ static long f2fs_fallocate(struct file *file, int mode,
 		return -EOPNOTSUPP;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 	mutex_lock(&inode->i_mutex);
 
 =======
 >>>>>>> 29f8554... F2FS Initial
+=======
+	mutex_lock(&inode->i_mutex);
+
+>>>>>>> 21c37c1... F2FS: latest commits
 	if (mode & FALLOC_FL_PUNCH_HOLE)
 		ret = punch_hole(inode, offset, len);
 	else
@@ -647,11 +705,17 @@ static long f2fs_fallocate(struct file *file, int mode,
 		mark_inode_dirty(inode);
 	}
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 	mutex_unlock(&inode->i_mutex);
 
 =======
 >>>>>>> 29f8554... F2FS Initial
+=======
+
+	mutex_unlock(&inode->i_mutex);
+
+>>>>>>> 21c37c1... F2FS: latest commits
 	trace_f2fs_fallocate(inode, mode, offset, len, ret);
 	return ret;
 }

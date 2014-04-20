@@ -213,10 +213,15 @@ static struct dentry *f2fs_lookup(struct inode *dir, struct dentry *dentry,
 		if (IS_ERR(inode))
 			return ERR_CAST(inode);
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 		stat_inc_inline_inode(inode);
 =======
 >>>>>>> 29f8554... F2FS Initial
+=======
+
+		stat_inc_inline_inode(inode);
+>>>>>>> 21c37c1... F2FS: latest commits
 	}
 
 	return d_splice_alias(inode, dentry);
@@ -435,6 +440,9 @@ static int f2fs_rename(struct inode *old_dir, struct dentry *old_dentry,
 
 		f2fs_set_link(new_dir, new_entry, new_page, old_inode);
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 21c37c1... F2FS: latest commits
 		down_write(&F2FS_I(old_inode)->i_sem);
 		F2FS_I(old_inode)->i_pino = new_dir->i_ino;
 		up_write(&F2FS_I(old_inode)->i_sem);
@@ -446,6 +454,7 @@ static int f2fs_rename(struct inode *old_dir, struct dentry *old_dentry,
 		drop_nlink(new_inode);
 		up_write(&F2FS_I(new_inode)->i_sem);
 
+<<<<<<< HEAD
 =======
 		F2FS_I(old_inode)->i_pino = new_dir->i_ino;
 
@@ -454,6 +463,8 @@ static int f2fs_rename(struct inode *old_dir, struct dentry *old_dentry,
 			drop_nlink(new_inode);
 		drop_nlink(new_inode);
 >>>>>>> 29f8554... F2FS Initial
+=======
+>>>>>>> 21c37c1... F2FS: latest commits
 		mark_inode_dirty(new_inode);
 
 		if (!new_inode->i_nlink)
@@ -484,12 +495,18 @@ static int f2fs_rename(struct inode *old_dir, struct dentry *old_dentry,
 			f2fs_set_link(old_inode, old_dir_entry,
 						old_dir_page, new_dir);
 <<<<<<< HEAD
+<<<<<<< HEAD
 			down_write(&F2FS_I(old_inode)->i_sem);
 			F2FS_I(old_inode)->i_pino = new_dir->i_ino;
 			up_write(&F2FS_I(old_inode)->i_sem);
 =======
 			F2FS_I(old_inode)->i_pino = new_dir->i_ino;
 >>>>>>> 29f8554... F2FS Initial
+=======
+			down_write(&F2FS_I(old_inode)->i_sem);
+			F2FS_I(old_inode)->i_pino = new_dir->i_ino;
+			up_write(&F2FS_I(old_inode)->i_sem);
+>>>>>>> 21c37c1... F2FS: latest commits
 			update_inode_page(old_inode);
 		} else {
 			kunmap(old_dir_page);

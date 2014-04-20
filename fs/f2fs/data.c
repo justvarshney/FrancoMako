@@ -141,10 +141,14 @@ void f2fs_submit_merged_bio(struct f2fs_sb_info *sbi,
 	io = is_read_io(rw) ? &sbi->read_io : &sbi->write_io[btype];
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 	down_write(&io->io_rwsem);
 =======
 	mutex_lock(&io->io_mutex);
 >>>>>>> 29f8554... F2FS Initial
+=======
+	down_write(&io->io_rwsem);
+>>>>>>> 21c37c1... F2FS: latest commits
 
 	/* change META to META_FLUSH in the checkpoint procedure */
 	if (type >= META_FLUSH) {
@@ -153,10 +157,14 @@ void f2fs_submit_merged_bio(struct f2fs_sb_info *sbi,
 	}
 	__submit_merged_bio(io);
 <<<<<<< HEAD
+<<<<<<< HEAD
 	up_write(&io->io_rwsem);
 =======
 	mutex_unlock(&io->io_mutex);
 >>>>>>> 29f8554... F2FS Initial
+=======
+	up_write(&io->io_rwsem);
+>>>>>>> 21c37c1... F2FS: latest commits
 }
 
 /*
@@ -195,10 +203,14 @@ void f2fs_submit_page_mbio(struct f2fs_sb_info *sbi, struct page *page,
 	verify_block_addr(sbi, blk_addr);
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 	down_write(&io->io_rwsem);
 =======
 	mutex_lock(&io->io_mutex);
 >>>>>>> 29f8554... F2FS Initial
+=======
+	down_write(&io->io_rwsem);
+>>>>>>> 21c37c1... F2FS: latest commits
 
 	if (!is_read)
 		inc_page_count(sbi, F2FS_WRITEBACK);
@@ -223,10 +235,14 @@ alloc_new:
 	io->last_block_in_bio = blk_addr;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 	up_write(&io->io_rwsem);
 =======
 	mutex_unlock(&io->io_mutex);
 >>>>>>> 29f8554... F2FS Initial
+=======
+	up_write(&io->io_rwsem);
+>>>>>>> 21c37c1... F2FS: latest commits
 	trace_f2fs_submit_page_mbio(page, fio->rw, fio->type, blk_addr);
 }
 
@@ -821,6 +837,7 @@ static int f2fs_write_data_page(struct page *page,
 	 */
 	offset = i_size & (PAGE_CACHE_SIZE - 1);
 <<<<<<< HEAD
+<<<<<<< HEAD
 	if ((page->index >= end_index + 1) || !offset)
 		goto out;
 
@@ -859,54 +876,51 @@ out:
 			dec_page_count(sbi, F2FS_DIRTY_DENTS);
 			inode_dec_dirty_dents(inode);
 		}
+=======
+	if ((page->index >= end_index + 1) || !offset)
+>>>>>>> 21c37c1... F2FS: latest commits
 		goto out;
-	}
 
 	zero_user_segment(page, offset, PAGE_CACHE_SIZE);
 write:
-	if (unlikely(sbi->por_doing)) {
-		err = AOP_WRITEPAGE_ACTIVATE;
+	if (unlikely(sbi->por_doing))
 		goto redirty_out;
-	}
 
 	/* Dentry blocks are controlled by checkpoint */
 	if (S_ISDIR(inode->i_mode)) {
-		dec_page_count(sbi, F2FS_DIRTY_DENTS);
-		inode_dec_dirty_dents(inode);
 		err = do_write_data_page(page, &fio);
-	} else {
-		f2fs_lock_op(sbi);
-
-		if (f2fs_has_inline_data(inode) || f2fs_may_inline(inode)) {
-			err = f2fs_write_inline_data(inode, page, offset);
-			f2fs_unlock_op(sbi);
-			goto out;
-		} else {
-			err = do_write_data_page(page, &fio);
-		}
-
-		f2fs_unlock_op(sbi);
-		need_balance_fs = true;
+		goto done;
 	}
-	if (err == -ENOENT)
-		goto out;
-	else if (err)
+
+	if (!wbc->for_reclaim)
+		need_balance_fs = true;
+	else if (has_not_enough_free_secs(sbi, 0))
 		goto redirty_out;
 
-	if (wbc->for_reclaim) {
-		f2fs_submit_merged_bio(sbi, DATA, WRITE);
-		need_balance_fs = false;
-	}
+	f2fs_lock_op(sbi);
+	if (f2fs_has_inline_data(inode) || f2fs_may_inline(inode))
+		err = f2fs_write_inline_data(inode, page, offset);
+	else
+		err = do_write_data_page(page, &fio);
+	f2fs_unlock_op(sbi);
+done:
+	if (err && err != -ENOENT)
+		goto redirty_out;
 
 	clear_cold_data(page);
 out:
+<<<<<<< HEAD
 >>>>>>> 29f8554... F2FS Initial
+=======
+	inode_dec_dirty_dents(inode);
+>>>>>>> 21c37c1... F2FS: latest commits
 	unlock_page(page);
 	if (need_balance_fs)
 		f2fs_balance_fs(sbi);
 	return 0;
 
 redirty_out:
+<<<<<<< HEAD
 <<<<<<< HEAD
 	redirty_page_for_writepage(wbc, page);
 	return AOP_WRITEPAGE_ACTIVATE;
@@ -921,6 +935,12 @@ redirty_out:
 #define MAX_DESIRED_PAGES_WP	4096
 
 >>>>>>> 29f8554... F2FS Initial
+=======
+	redirty_page_for_writepage(wbc, page);
+	return AOP_WRITEPAGE_ACTIVATE;
+}
+
+>>>>>>> 21c37c1... F2FS: latest commits
 static int __f2fs_writepage(struct page *page, struct writeback_control *wbc,
 			void *data)
 {
@@ -938,22 +958,30 @@ static int f2fs_write_data_pages(struct address_space *mapping,
 	bool locked = false;
 	int ret;
 <<<<<<< HEAD
+<<<<<<< HEAD
 	long diff;
 =======
 	long excess_nrtw = 0, desired_nrtw;
 >>>>>>> 29f8554... F2FS Initial
+=======
+	long diff;
+>>>>>>> 21c37c1... F2FS: latest commits
 
 	/* deal with chardevs and other special file */
 	if (!mapping->a_ops->writepage)
 		return 0;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 21c37c1... F2FS: latest commits
 	if (S_ISDIR(inode->i_mode) && wbc->sync_mode == WB_SYNC_NONE &&
 			get_dirty_dents(inode) < nr_pages_to_skip(sbi, DATA) &&
 			available_free_memory(sbi, DIRTY_DENTS))
 		goto skip_write;
 
 	diff = nr_pages_to_write(sbi, DATA, wbc);
+<<<<<<< HEAD
 =======
 	if (wbc->nr_to_write < MAX_DESIRED_PAGES_WP) {
 		desired_nrtw = MAX_DESIRED_PAGES_WP;
@@ -961,6 +989,8 @@ static int f2fs_write_data_pages(struct address_space *mapping,
 		wbc->nr_to_write = desired_nrtw;
 	}
 >>>>>>> 29f8554... F2FS Initial
+=======
+>>>>>>> 21c37c1... F2FS: latest commits
 
 	if (!S_ISDIR(inode->i_mode)) {
 		mutex_lock(&sbi->writepages);
@@ -975,6 +1005,7 @@ static int f2fs_write_data_pages(struct address_space *mapping,
 	remove_dirty_dir_inode(inode);
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 	wbc->nr_to_write = max((long)0, wbc->nr_to_write - diff);
 	return ret;
 
@@ -985,6 +1016,14 @@ skip_write:
 	wbc->nr_to_write -= excess_nrtw;
 	return ret;
 >>>>>>> 29f8554... F2FS Initial
+=======
+	wbc->nr_to_write = max((long)0, wbc->nr_to_write - diff);
+	return ret;
+
+skip_write:
+	wbc->pages_skipped += get_dirty_dents(inode);
+	return 0;
+>>>>>>> 21c37c1... F2FS: latest commits
 }
 
 static int f2fs_write_begin(struct file *file, struct address_space *mapping,
@@ -1038,6 +1077,7 @@ inline_data:
 		zero_user_segment(page, 0, PAGE_CACHE_SIZE);
 	} else {
 <<<<<<< HEAD
+<<<<<<< HEAD
 		if (f2fs_has_inline_data(inode)) {
 			err = f2fs_read_inline_data(inode, page);
 			if (err) {
@@ -1053,13 +1093,27 @@ inline_data:
 
 =======
 		if (f2fs_has_inline_data(inode))
+=======
+		if (f2fs_has_inline_data(inode)) {
+>>>>>>> 21c37c1... F2FS: latest commits
 			err = f2fs_read_inline_data(inode, page);
-		else
+			if (err) {
+				page_cache_release(page);
+				return err;
+			}
+		} else {
 			err = f2fs_submit_page_bio(sbi, page, dn.data_blkaddr,
 							READ_SYNC);
+<<<<<<< HEAD
 		if (err)
 			return err;
 >>>>>>> 29f8554... F2FS Initial
+=======
+			if (err)
+				return err;
+		}
+
+>>>>>>> 21c37c1... F2FS: latest commits
 		lock_page(page);
 		if (unlikely(!PageUptodate(page))) {
 			f2fs_put_page(page, 1);
@@ -1135,6 +1189,7 @@ static void f2fs_invalidate_data_page(struct page *page, unsigned long offset)
 {
 	struct inode *inode = page->mapping->host;
 <<<<<<< HEAD
+<<<<<<< HEAD
 	if (PageDirty(page))
 		inode_dec_dirty_dents(inode);
 =======
@@ -1144,6 +1199,10 @@ static void f2fs_invalidate_data_page(struct page *page, unsigned long offset)
 		inode_dec_dirty_dents(inode);
 	}
 >>>>>>> 29f8554... F2FS Initial
+=======
+	if (PageDirty(page))
+		inode_dec_dirty_dents(inode);
+>>>>>>> 21c37c1... F2FS: latest commits
 	ClearPagePrivate(page);
 }
 

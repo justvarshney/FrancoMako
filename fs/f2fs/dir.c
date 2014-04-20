@@ -22,6 +22,7 @@ static unsigned long dir_blocks(struct inode *inode)
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 static unsigned int dir_buckets(unsigned int level, int dir_level)
 {
 	if (level < MAX_DIR_HASH_DEPTH / 2)
@@ -30,12 +31,19 @@ static unsigned int dir_buckets(unsigned int level, int dir_level)
 		return 1 << ((MAX_DIR_HASH_DEPTH / 2 + dir_level) - 1);
 =======
 static unsigned int dir_buckets(unsigned int level)
+=======
+static unsigned int dir_buckets(unsigned int level, int dir_level)
+>>>>>>> 21c37c1... F2FS: latest commits
 {
 	if (level < MAX_DIR_HASH_DEPTH / 2)
-		return 1 << level;
+		return 1 << (level + dir_level);
 	else
+<<<<<<< HEAD
 		return 1 << ((MAX_DIR_HASH_DEPTH / 2) - 1);
 >>>>>>> 29f8554... F2FS Initial
+=======
+		return 1 << ((MAX_DIR_HASH_DEPTH / 2 + dir_level) - 1);
+>>>>>>> 21c37c1... F2FS: latest commits
 }
 
 static unsigned int bucket_blocks(unsigned int level)
@@ -75,21 +83,30 @@ static void set_de_type(struct f2fs_dir_entry *de, struct inode *inode)
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 static unsigned long dir_block_index(unsigned int level,
 				int dir_level, unsigned int idx)
 =======
 static unsigned long dir_block_index(unsigned int level, unsigned int idx)
 >>>>>>> 29f8554... F2FS Initial
+=======
+static unsigned long dir_block_index(unsigned int level,
+				int dir_level, unsigned int idx)
+>>>>>>> 21c37c1... F2FS: latest commits
 {
 	unsigned long i;
 	unsigned long bidx = 0;
 
 	for (i = 0; i < level; i++)
 <<<<<<< HEAD
+<<<<<<< HEAD
 		bidx += dir_buckets(i, dir_level) * bucket_blocks(i);
 =======
 		bidx += dir_buckets(i) * bucket_blocks(i);
 >>>>>>> 29f8554... F2FS Initial
+=======
+		bidx += dir_buckets(i, dir_level) * bucket_blocks(i);
+>>>>>>> 21c37c1... F2FS: latest commits
 	bidx += idx * bucket_blocks(level);
 	return bidx;
 }
@@ -113,6 +130,7 @@ static struct f2fs_dir_entry *find_in_block(struct page *dentry_page,
 {
 	struct f2fs_dir_entry *de;
 <<<<<<< HEAD
+<<<<<<< HEAD
 	unsigned long bit_pos = 0;
 	struct f2fs_dentry_block *dentry_blk = kmap(dentry_page);
 	const void *dentry_bits = &dentry_blk->dentry_bitmap;
@@ -130,16 +148,29 @@ static struct f2fs_dir_entry *find_in_block(struct page *dentry_page,
 		de = &dentry_blk->dentry[bit_pos];
 =======
 	unsigned long bit_pos, end_pos, next_pos;
+=======
+	unsigned long bit_pos = 0;
+>>>>>>> 21c37c1... F2FS: latest commits
 	struct f2fs_dentry_block *dentry_blk = kmap(dentry_page);
-	int slots;
+	const void *dentry_bits = &dentry_blk->dentry_bitmap;
+	int max_len = 0;
 
-	bit_pos = find_next_bit_le(&dentry_blk->dentry_bitmap,
-					NR_DENTRY_IN_BLOCK, 0);
 	while (bit_pos < NR_DENTRY_IN_BLOCK) {
+		if (!test_bit_le(bit_pos, dentry_bits)) {
+			if (bit_pos == 0)
+				max_len = 1;
+			else if (!test_bit_le(bit_pos - 1, dentry_bits))
+				max_len++;
+			bit_pos++;
+			continue;
+		}
 		de = &dentry_blk->dentry[bit_pos];
+<<<<<<< HEAD
 		slots = GET_DENTRY_SLOTS(le16_to_cpu(de->name_len));
 
 >>>>>>> 29f8554... F2FS Initial
+=======
+>>>>>>> 21c37c1... F2FS: latest commits
 		if (nocase) {
 			if ((le16_to_cpu(de->name_len) == namelen) &&
 			    !strncasecmp(dentry_blk->filename[bit_pos],
@@ -155,11 +186,15 @@ static struct f2fs_dir_entry *find_in_block(struct page *dentry_page,
 			}
 		}
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 21c37c1... F2FS: latest commits
 		if (max_len > *max_slots) {
 			*max_slots = max_len;
 			max_len = 0;
 		}
 		bit_pos += GET_DENTRY_SLOTS(le16_to_cpu(de->name_len));
+<<<<<<< HEAD
 =======
 		next_pos = bit_pos + slots;
 		bit_pos = find_next_bit_le(&dentry_blk->dentry_bitmap,
@@ -171,16 +206,23 @@ static struct f2fs_dir_entry *find_in_block(struct page *dentry_page,
 		if (*max_slots < end_pos - next_pos)
 			*max_slots = end_pos - next_pos;
 >>>>>>> 29f8554... F2FS Initial
+=======
+>>>>>>> 21c37c1... F2FS: latest commits
 	}
 
 	de = NULL;
 	kunmap(dentry_page);
 found:
 <<<<<<< HEAD
+<<<<<<< HEAD
 	if (max_len > *max_slots)
 		*max_slots = max_len;
 =======
 >>>>>>> 29f8554... F2FS Initial
+=======
+	if (max_len > *max_slots)
+		*max_slots = max_len;
+>>>>>>> 21c37c1... F2FS: latest commits
 	return de;
 }
 
@@ -200,6 +242,7 @@ static struct f2fs_dir_entry *find_in_level(struct inode *dir,
 	f2fs_bug_on(level > MAX_DIR_HASH_DEPTH);
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 	nbucket = dir_buckets(level, F2FS_I(dir)->i_dir_level);
 	nblock = bucket_blocks(level);
 
@@ -211,6 +254,13 @@ static struct f2fs_dir_entry *find_in_level(struct inode *dir,
 
 	bidx = dir_block_index(level, le32_to_cpu(namehash) % nbucket);
 >>>>>>> 29f8554... F2FS Initial
+=======
+	nbucket = dir_buckets(level, F2FS_I(dir)->i_dir_level);
+	nblock = bucket_blocks(level);
+
+	bidx = dir_block_index(level, F2FS_I(dir)->i_dir_level,
+					le32_to_cpu(namehash) % nbucket);
+>>>>>>> 21c37c1... F2FS: latest commits
 	end_block = bidx + nblock;
 
 	for (; bidx < end_block; bidx++) {
@@ -323,10 +373,14 @@ void f2fs_set_link(struct inode *dir, struct f2fs_dir_entry *de,
 {
 	lock_page(page);
 <<<<<<< HEAD
+<<<<<<< HEAD
 	f2fs_wait_on_page_writeback(page, DATA);
 =======
 	wait_on_page_writeback(page);
 >>>>>>> 29f8554... F2FS Initial
+=======
+	f2fs_wait_on_page_writeback(page, DATA);
+>>>>>>> 21c37c1... F2FS: latest commits
 	de->ino = cpu_to_le32(inode->i_ino);
 	set_de_type(de, inode);
 	kunmap(page);
@@ -426,19 +480,25 @@ static struct page *init_inode_metadata(struct inode *inode,
 		if (err)
 			goto put_error;
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 
 		wait_on_page_writeback(page);
 >>>>>>> 29f8554... F2FS Initial
+=======
+>>>>>>> 21c37c1... F2FS: latest commits
 	} else {
 		page = get_node_page(F2FS_SB(dir->i_sb), inode->i_ino);
 		if (IS_ERR(page))
 			return page;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 		wait_on_page_writeback(page);
 >>>>>>> 29f8554... F2FS Initial
+=======
+>>>>>>> 21c37c1... F2FS: latest commits
 		set_cold_node(inode, page);
 	}
 
@@ -457,12 +517,18 @@ static struct page *init_inode_metadata(struct inode *inode,
 put_error:
 	f2fs_put_page(page, 1);
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 21c37c1... F2FS: latest commits
 	/* once the failed inode becomes a bad inode, i_mode is S_IFREG */
 	truncate_inode_pages(&inode->i_data, 0);
 	truncate_blocks(inode, 0);
 	remove_dirty_dir_inode(inode);
+<<<<<<< HEAD
 =======
 >>>>>>> 29f8554... F2FS Initial
+=======
+>>>>>>> 21c37c1... F2FS: latest commits
 error:
 	remove_inode_page(inode);
 	return ERR_PTR(err);
@@ -487,11 +553,14 @@ static void update_parent_metadata(struct inode *dir, struct inode *inode,
 	}
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 	if (is_inode_flag_set(F2FS_I(dir), FI_UPDATE_DIR))
 		update_inode_page(dir);
 
 >>>>>>> 29f8554... F2FS Initial
+=======
+>>>>>>> 21c37c1... F2FS: latest commits
 	if (is_inode_flag_set(F2FS_I(inode), FI_INC_LINK))
 		clear_inode_flag(F2FS_I(inode), FI_INC_LINK);
 }
@@ -559,6 +628,7 @@ start:
 		++current_depth;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 	nbucket = dir_buckets(level, F2FS_I(dir)->i_dir_level);
 	nblock = bucket_blocks(level);
 
@@ -570,6 +640,13 @@ start:
 
 	bidx = dir_block_index(level, (le32_to_cpu(dentry_hash) % nbucket));
 >>>>>>> 29f8554... F2FS Initial
+=======
+	nbucket = dir_buckets(level, F2FS_I(dir)->i_dir_level);
+	nblock = bucket_blocks(level);
+
+	bidx = dir_block_index(level, F2FS_I(dir)->i_dir_level,
+				(le32_to_cpu(dentry_hash) % nbucket));
+>>>>>>> 21c37c1... F2FS: latest commits
 
 	for (block = bidx; block <= (bidx + nblock - 1); block++) {
 		dentry_page = get_new_data_page(dir, NULL, block, true);
@@ -590,6 +667,7 @@ start:
 	goto start;
 add_dentry:
 <<<<<<< HEAD
+<<<<<<< HEAD
 	f2fs_wait_on_page_writeback(dentry_page, DATA);
 
 	down_write(&F2FS_I(inode)->i_sem);
@@ -597,6 +675,11 @@ add_dentry:
 	wait_on_page_writeback(dentry_page);
 
 >>>>>>> 29f8554... F2FS Initial
+=======
+	f2fs_wait_on_page_writeback(dentry_page, DATA);
+
+	down_write(&F2FS_I(inode)->i_sem);
+>>>>>>> 21c37c1... F2FS: latest commits
 	page = init_inode_metadata(inode, dir, name);
 	if (IS_ERR(page)) {
 		err = PTR_ERR(page);
@@ -620,15 +703,21 @@ add_dentry:
 	update_parent_metadata(dir, inode, current_depth);
 fail:
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 21c37c1... F2FS: latest commits
 	up_write(&F2FS_I(inode)->i_sem);
 
 	if (is_inode_flag_set(F2FS_I(dir), FI_UPDATE_DIR)) {
 		update_inode_page(dir);
 		clear_inode_flag(F2FS_I(dir), FI_UPDATE_DIR);
 	}
+<<<<<<< HEAD
 =======
 	clear_inode_flag(F2FS_I(dir), FI_UPDATE_DIR);
 >>>>>>> 29f8554... F2FS Initial
+=======
+>>>>>>> 21c37c1... F2FS: latest commits
 	kunmap(dentry_page);
 	f2fs_put_page(dentry_page, 1);
 	return err;
@@ -646,19 +735,26 @@ void f2fs_delete_entry(struct f2fs_dir_entry *dentry, struct page *page,
 	struct address_space *mapping = page->mapping;
 	struct inode *dir = mapping->host;
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 	struct f2fs_sb_info *sbi = F2FS_SB(dir->i_sb);
 >>>>>>> 29f8554... F2FS Initial
+=======
+>>>>>>> 21c37c1... F2FS: latest commits
 	int slots = GET_DENTRY_SLOTS(le16_to_cpu(dentry->name_len));
 	void *kaddr = page_address(page);
 	int i;
 
 	lock_page(page);
 <<<<<<< HEAD
+<<<<<<< HEAD
 	f2fs_wait_on_page_writeback(page, DATA);
 =======
 	wait_on_page_writeback(page);
 >>>>>>> 29f8554... F2FS Initial
+=======
+	f2fs_wait_on_page_writeback(page, DATA);
+>>>>>>> 21c37c1... F2FS: latest commits
 
 	dentry_blk = (struct f2fs_dentry_block *)kaddr;
 	bit_pos = dentry - (struct f2fs_dir_entry *)dentry_blk->dentry;
@@ -676,12 +772,18 @@ void f2fs_delete_entry(struct f2fs_dir_entry *dentry, struct page *page,
 
 	if (inode) {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 21c37c1... F2FS: latest commits
 		struct f2fs_sb_info *sbi = F2FS_SB(dir->i_sb);
 
 		down_write(&F2FS_I(inode)->i_sem);
 
+<<<<<<< HEAD
 =======
 >>>>>>> 29f8554... F2FS Initial
+=======
+>>>>>>> 21c37c1... F2FS: latest commits
 		if (S_ISDIR(inode->i_mode)) {
 			drop_nlink(dir);
 			update_inode_page(dir);
@@ -693,9 +795,13 @@ void f2fs_delete_entry(struct f2fs_dir_entry *dentry, struct page *page,
 			i_size_write(inode, 0);
 		}
 <<<<<<< HEAD
+<<<<<<< HEAD
 		up_write(&F2FS_I(inode)->i_sem);
 =======
 >>>>>>> 29f8554... F2FS Initial
+=======
+		up_write(&F2FS_I(inode)->i_sem);
+>>>>>>> 21c37c1... F2FS: latest commits
 		update_inode_page(inode);
 
 		if (inode->i_nlink == 0)
@@ -709,9 +815,12 @@ void f2fs_delete_entry(struct f2fs_dir_entry *dentry, struct page *page,
 		clear_page_dirty_for_io(page);
 		ClearPageUptodate(page);
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 		dec_page_count(sbi, F2FS_DIRTY_DENTS);
 >>>>>>> 29f8554... F2FS Initial
+=======
+>>>>>>> 21c37c1... F2FS: latest commits
 		inode_dec_dirty_dents(dir);
 	}
 	f2fs_put_page(page, 1);
