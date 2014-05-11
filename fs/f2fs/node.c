@@ -1012,6 +1012,7 @@ struct page *new_node_page(struct dnode_of_data *dn,
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 	page = grab_cache_page_write_begin(NODE_MAPPING(sbi),
 					dn->nid, AOP_FLAG_NOFS);
 =======
@@ -1021,6 +1022,9 @@ struct page *new_node_page(struct dnode_of_data *dn,
 	page = grab_cache_page_write_begin(NODE_MAPPING(sbi),
 					dn->nid, AOP_FLAG_NOFS);
 >>>>>>> 21c37c1... F2FS: latest commits
+=======
+	page = grab_cache_page(NODE_MAPPING(sbi), dn->nid);
+>>>>>>> 41ca32c... F2FS: upstream updates
 	if (!page)
 		return ERR_PTR(-ENOMEM);
 
@@ -1045,6 +1049,7 @@ struct page *new_node_page(struct dnode_of_data *dn,
 	set_node_addr(sbi, &new_ni, NEW_ADDR, false);
 >>>>>>> 21c37c1... F2FS: latest commits
 
+	f2fs_wait_on_page_writeback(page, NODE);
 	fill_node_footer(page, dn->nid, dn->inode->i_ino, ofs, true);
 	set_cold_node(dn->inode, page);
 	SetPageUptodate(page);
@@ -1134,6 +1139,7 @@ struct page *get_node_page(struct f2fs_sb_info *sbi, pgoff_t nid)
 repeat:
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 	page = grab_cache_page_write_begin(NODE_MAPPING(sbi),
 					nid, AOP_FLAG_NOFS);
 =======
@@ -1143,6 +1149,9 @@ repeat:
 	page = grab_cache_page_write_begin(NODE_MAPPING(sbi),
 					nid, AOP_FLAG_NOFS);
 >>>>>>> 21c37c1... F2FS: latest commits
+=======
+	page = grab_cache_page(NODE_MAPPING(sbi), nid);
+>>>>>>> 41ca32c... F2FS: upstream updates
 	if (!page)
 		return ERR_PTR(-ENOMEM);
 
@@ -1420,6 +1429,8 @@ static int f2fs_write_node_page(struct page *page,
 		.rw = (wbc->sync_mode == WB_SYNC_ALL) ? WRITE_SYNC : WRITE,
 	};
 
+	trace_f2fs_writepage(page, NODE);
+
 	if (unlikely(sbi->por_doing))
 		goto redirty_out;
 
@@ -1506,6 +1517,8 @@ static int f2fs_write_node_pages(struct address_space *mapping,
 =======
 	long diff;
 >>>>>>> 21c37c1... F2FS: latest commits
+
+	trace_f2fs_writepages(mapping->host, wbc, NODE);
 
 	/* balancing f2fs's metadata in background */
 	f2fs_balance_fs_bg(sbi);
@@ -2048,6 +2061,7 @@ static void recover_inline_xattr(struct inode *inode, struct page *page)
 	src_addr = inline_xattr_addr(page);
 	inline_size = inline_xattr_size(inode);
 
+	f2fs_wait_on_page_writeback(ipage, NODE);
 	memcpy(dst_addr, src_addr, inline_size);
 
 	update_inode(inode, ipage);

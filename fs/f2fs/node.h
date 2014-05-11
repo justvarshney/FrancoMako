@@ -89,6 +89,7 @@ struct nat_entry {
 	do {								\
 		ne->checkpointed = false;				\
 		list_move_tail(&ne->list, &nm_i->dirty_nat_entries);	\
+<<<<<<< HEAD
 	} while (0);
 <<<<<<< HEAD
 #define __clear_nat_cache_dirty(nm_i, ne)				\
@@ -102,12 +103,19 @@ struct nat_entry {
 	list_move_tail(&ne->list, &nm_i->nat_entries);
 >>>>>>> 29f8554... F2FS Initial
 =======
+=======
+	} while (0)
+>>>>>>> 41ca32c... F2FS: upstream updates
 #define __clear_nat_cache_dirty(nm_i, ne)				\
 	do {								\
 		ne->checkpointed = true;				\
 		list_move_tail(&ne->list, &nm_i->nat_entries);		\
+<<<<<<< HEAD
 	} while (0);
 >>>>>>> 21c37c1... F2FS: latest commits
+=======
+	} while (0)
+>>>>>>> 41ca32c... F2FS: upstream updates
 #define inc_node_version(version)	(++version)
 
 static inline void node_info_from_raw_nat(struct node_info *ni,
@@ -332,7 +340,7 @@ static inline void set_nid(struct page *p, int off, nid_t nid, bool i)
 {
 	struct f2fs_node *rn = F2FS_NODE(p);
 
-	wait_on_page_writeback(p);
+	f2fs_wait_on_page_writeback(p, NODE);
 
 	if (i)
 		rn->i.i_nid[off - NODE_DIR1_BLOCK] = cpu_to_le32(nid);
