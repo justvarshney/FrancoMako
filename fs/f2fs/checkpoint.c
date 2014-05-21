@@ -33,21 +33,12 @@ struct page *grab_meta_page(struct f2fs_sb_info *sbi, pgoff_t index)
 	struct address_space *mapping = META_MAPPING(sbi);
 	struct page *page = NULL;
 repeat:
-<<<<<<< HEAD
 	page = grab_cache_page_write_begin(mapping, index, AOP_FLAG_NOFS);
-=======
-	page = grab_cache_page(mapping, index);
->>>>>>> 29f8554... F2FS Initial
 	if (!page) {
 		cond_resched();
 		goto repeat;
 	}
 
-<<<<<<< HEAD
-=======
-	/* We wait writeback only inside grab_meta_page() */
-	wait_on_page_writeback(page);
->>>>>>> 29f8554... F2FS Initial
 	SetPageUptodate(page);
 	return page;
 }
@@ -82,7 +73,6 @@ out:
 	return page;
 }
 
-<<<<<<< HEAD
 static inline int get_max_meta_blks(struct f2fs_sb_info *sbi, int type)
 {
 	switch (type) {
@@ -161,15 +151,12 @@ out:
 	return blkno - start;
 }
 
-=======
->>>>>>> 29f8554... F2FS Initial
 static int f2fs_write_meta_page(struct page *page,
 				struct writeback_control *wbc)
 {
 	struct inode *inode = page->mapping->host;
 	struct f2fs_sb_info *sbi = F2FS_SB(inode->i_sb);
 
-<<<<<<< HEAD
 	if (unlikely(sbi->por_doing))
 		goto redirty_out;
 	if (wbc->for_reclaim)
@@ -182,31 +169,12 @@ static int f2fs_write_meta_page(struct page *page,
 	f2fs_wait_on_page_writeback(page, META);
 	write_meta_page(sbi, page);
 no_write:
-=======
-	/* Should not write any meta pages, if any IO error was occurred */
-	if (unlikely(sbi->por_doing ||
-			is_set_ckpt_flags(F2FS_CKPT(sbi), CP_ERROR_FLAG)))
-		goto redirty_out;
-
-	if (wbc->for_reclaim)
-		goto redirty_out;
-
-	wait_on_page_writeback(page);
-
-	write_meta_page(sbi, page);
->>>>>>> 29f8554... F2FS Initial
 	dec_page_count(sbi, F2FS_DIRTY_META);
 	unlock_page(page);
 	return 0;
 
 redirty_out:
-<<<<<<< HEAD
 	redirty_page_for_writepage(wbc, page);
-=======
-	dec_page_count(sbi, F2FS_DIRTY_META);
-	wbc->pages_skipped++;
-	set_page_dirty(page);
->>>>>>> 29f8554... F2FS Initial
 	return AOP_WRITEPAGE_ACTIVATE;
 }
 
@@ -214,7 +182,6 @@ static int f2fs_write_meta_pages(struct address_space *mapping,
 				struct writeback_control *wbc)
 {
 	struct f2fs_sb_info *sbi = F2FS_SB(mapping->host->i_sb);
-<<<<<<< HEAD
 	long diff, written;
 
 	/* collect a number of dirty meta pages and write together */
@@ -232,23 +199,6 @@ static int f2fs_write_meta_pages(struct address_space *mapping,
 
 skip_write:
 	wbc->pages_skipped += get_pages(sbi, F2FS_DIRTY_META);
-=======
-	int nrpages = MAX_BIO_BLOCKS(max_hw_blocks(sbi));
-	long written;
-
-	if (wbc->for_kupdate)
-		return 0;
-
-	/* collect a number of dirty meta pages and write together */
-	if (get_pages(sbi, F2FS_DIRTY_META) < nrpages)
-		return 0;
-
-	/* if mounting is failed, skip writing node pages */
-	mutex_lock(&sbi->cp_mutex);
-	written = sync_meta_pages(sbi, META, nrpages);
-	mutex_unlock(&sbi->cp_mutex);
-	wbc->nr_to_write -= written;
->>>>>>> 29f8554... F2FS Initial
 	return 0;
 }
 
@@ -275,7 +225,6 @@ long sync_meta_pages(struct f2fs_sb_info *sbi, enum page_type type,
 
 		for (i = 0; i < nr_pages; i++) {
 			struct page *page = pvec.pages[i];
-<<<<<<< HEAD
 
 			lock_page(page);
 
@@ -292,12 +241,6 @@ continue_unlock:
 			if (!clear_page_dirty_for_io(page))
 				goto continue_unlock;
 
-=======
-			lock_page(page);
-			f2fs_bug_on(page->mapping != mapping);
-			f2fs_bug_on(!PageDirty(page));
-			clear_page_dirty_for_io(page);
->>>>>>> 29f8554... F2FS Initial
 			if (f2fs_write_meta_page(page, &wbc)) {
 				unlock_page(page);
 				break;
@@ -366,25 +309,15 @@ void release_orphan_inode(struct f2fs_sb_info *sbi)
 
 void add_orphan_inode(struct f2fs_sb_info *sbi, nid_t ino)
 {
-<<<<<<< HEAD
 	struct list_head *head;
 	struct orphan_inode_entry *new, *orphan;
-=======
-	struct list_head *head, *this;
-	struct orphan_inode_entry *new = NULL, *orphan = NULL;
->>>>>>> 29f8554... F2FS Initial
 
 	new = f2fs_kmem_cache_alloc(orphan_entry_slab, GFP_ATOMIC);
 	new->ino = ino;
 
 	spin_lock(&sbi->orphan_inode_lock);
 	head = &sbi->orphan_inode_list;
-<<<<<<< HEAD
 	list_for_each_entry(orphan, head, list) {
-=======
-	list_for_each(this, head) {
-		orphan = list_entry(this, struct orphan_inode_entry, list);
->>>>>>> 29f8554... F2FS Initial
 		if (orphan->ino == ino) {
 			spin_unlock(&sbi->orphan_inode_lock);
 			kmem_cache_free(orphan_entry_slab, new);
@@ -393,21 +326,10 @@ void add_orphan_inode(struct f2fs_sb_info *sbi, nid_t ino)
 
 		if (orphan->ino > ino)
 			break;
-<<<<<<< HEAD
 	}
 
 	/* add new orphan entry into list which is sorted by inode number */
 	list_add_tail(&new->list, &orphan->list);
-=======
-		orphan = NULL;
-	}
-
-	/* add new_oentry into list which is sorted by inode number */
-	if (orphan)
-		list_add(&new->list, this->prev);
-	else
-		list_add_tail(&new->list, head);
->>>>>>> 29f8554... F2FS Initial
 	spin_unlock(&sbi->orphan_inode_lock);
 }
 
@@ -421,10 +343,6 @@ void remove_orphan_inode(struct f2fs_sb_info *sbi, nid_t ino)
 	list_for_each_entry(orphan, head, list) {
 		if (orphan->ino == ino) {
 			list_del(&orphan->list);
-<<<<<<< HEAD
-=======
-			kmem_cache_free(orphan_entry_slab, orphan);
->>>>>>> 29f8554... F2FS Initial
 			if (sbi->n_orphans == 0) {
 				f2fs_msg(sbi->sb, KERN_ERR, "removing "
 						"unacquired orphan inode %d",
@@ -432,13 +350,9 @@ void remove_orphan_inode(struct f2fs_sb_info *sbi, nid_t ino)
 				f2fs_handle_error(sbi);
 			} else
 				sbi->n_orphans--;
-<<<<<<< HEAD
 			spin_unlock(&sbi->orphan_inode_lock);
 			kmem_cache_free(orphan_entry_slab, orphan);
 			return;
-=======
-			break;
->>>>>>> 29f8554... F2FS Initial
 		}
 	}
 	spin_unlock(&sbi->orphan_inode_lock);
@@ -470,11 +384,8 @@ void recover_orphan_inodes(struct f2fs_sb_info *sbi)
 	start_blk = __start_cp_addr(sbi) + 1;
 	orphan_blkaddr = __start_sum_addr(sbi) - 1;
 
-<<<<<<< HEAD
 	ra_meta_pages(sbi, start_blk, orphan_blkaddr, META_CP);
 
-=======
->>>>>>> 29f8554... F2FS Initial
 	for (i = 0; i < orphan_blkaddr; i++) {
 		struct page *page = get_meta_page(sbi, start_blk + i);
 		struct f2fs_orphan_block *orphan_blk;
@@ -655,7 +566,6 @@ fail_no_cp:
 static int __add_dirty_inode(struct inode *inode, struct dir_inode_entry *new)
 {
 	struct f2fs_sb_info *sbi = F2FS_SB(inode->i_sb);
-<<<<<<< HEAD
 
 	if (is_inode_flag_set(F2FS_I(inode), FI_DIRTY_DIR))
 		return -EEXIST;
@@ -663,18 +573,6 @@ static int __add_dirty_inode(struct inode *inode, struct dir_inode_entry *new)
 	set_inode_flag(F2FS_I(inode), FI_DIRTY_DIR);
 	F2FS_I(inode)->dirty_dir = new;
 	list_add_tail(&new->list, &sbi->dir_inode_list);
-=======
-	struct list_head *head = &sbi->dir_inode_list;
-	struct list_head *this;
-
-	list_for_each(this, head) {
-		struct dir_inode_entry *entry;
-		entry = list_entry(this, struct dir_inode_entry, list);
-		if (unlikely(entry->inode == inode))
-			return -EEXIST;
-	}
-	list_add_tail(&new->list, head);
->>>>>>> 29f8554... F2FS Initial
 	stat_inc_dirty_dir(sbi);
 	return 0;
 }
@@ -683,10 +581,7 @@ void set_dirty_dir_page(struct inode *inode, struct page *page)
 {
 	struct f2fs_sb_info *sbi = F2FS_SB(inode->i_sb);
 	struct dir_inode_entry *new;
-<<<<<<< HEAD
 	int ret = 0;
-=======
->>>>>>> 29f8554... F2FS Initial
 
 	if (!S_ISDIR(inode->i_mode))
 		return;
@@ -696,7 +591,6 @@ void set_dirty_dir_page(struct inode *inode, struct page *page)
 	INIT_LIST_HEAD(&new->list);
 
 	spin_lock(&sbi->dir_inode_lock);
-<<<<<<< HEAD
 	ret = __add_dirty_inode(inode, new);
 	inode_inc_dirty_dents(inode);
 	SetPagePrivate(page);
@@ -704,15 +598,6 @@ void set_dirty_dir_page(struct inode *inode, struct page *page)
 
 	if (ret)
 		kmem_cache_free(inode_entry_slab, new);
-=======
-	if (__add_dirty_inode(inode, new))
-		kmem_cache_free(inode_entry_slab, new);
-
-	inc_page_count(sbi, F2FS_DIRTY_DENTS);
-	inode_inc_dirty_dents(inode);
-	SetPagePrivate(page);
-	spin_unlock(&sbi->dir_inode_lock);
->>>>>>> 29f8554... F2FS Initial
 }
 
 void add_dirty_dir_inode(struct inode *inode)
@@ -720,53 +605,34 @@ void add_dirty_dir_inode(struct inode *inode)
 	struct f2fs_sb_info *sbi = F2FS_SB(inode->i_sb);
 	struct dir_inode_entry *new =
 			f2fs_kmem_cache_alloc(inode_entry_slab, GFP_NOFS);
-<<<<<<< HEAD
 	int ret = 0;
-=======
->>>>>>> 29f8554... F2FS Initial
 
 	new->inode = inode;
 	INIT_LIST_HEAD(&new->list);
 
 	spin_lock(&sbi->dir_inode_lock);
-<<<<<<< HEAD
 	ret = __add_dirty_inode(inode, new);
 	spin_unlock(&sbi->dir_inode_lock);
 
 	if (ret)
 		kmem_cache_free(inode_entry_slab, new);
-=======
-	if (__add_dirty_inode(inode, new))
-		kmem_cache_free(inode_entry_slab, new);
-	spin_unlock(&sbi->dir_inode_lock);
->>>>>>> 29f8554... F2FS Initial
 }
 
 void remove_dirty_dir_inode(struct inode *inode)
 {
 	struct f2fs_sb_info *sbi = F2FS_SB(inode->i_sb);
-<<<<<<< HEAD
 	struct dir_inode_entry *entry;
-=======
-
-	struct list_head *this, *head;
->>>>>>> 29f8554... F2FS Initial
 
 	if (!S_ISDIR(inode->i_mode))
 		return;
 
 	spin_lock(&sbi->dir_inode_lock);
-<<<<<<< HEAD
 	if (get_dirty_dents(inode) ||
 			!is_inode_flag_set(F2FS_I(inode), FI_DIRTY_DIR)) {
-=======
-	if (atomic_read(&F2FS_I(inode)->dirty_dents)) {
->>>>>>> 29f8554... F2FS Initial
 		spin_unlock(&sbi->dir_inode_lock);
 		return;
 	}
 
-<<<<<<< HEAD
 	entry = F2FS_I(inode)->dirty_dir;
 	list_del(&entry->list);
 	F2FS_I(inode)->dirty_dir = NULL;
@@ -774,20 +640,6 @@ void remove_dirty_dir_inode(struct inode *inode)
 	stat_dec_dirty_dir(sbi);
 	spin_unlock(&sbi->dir_inode_lock);
 	kmem_cache_free(inode_entry_slab, entry);
-=======
-	head = &sbi->dir_inode_list;
-	list_for_each(this, head) {
-		struct dir_inode_entry *entry;
-		entry = list_entry(this, struct dir_inode_entry, list);
-		if (entry->inode == inode) {
-			list_del(&entry->list);
-			kmem_cache_free(inode_entry_slab, entry);
-			stat_dec_dirty_dir(sbi);
-			break;
-		}
-	}
-	spin_unlock(&sbi->dir_inode_lock);
->>>>>>> 29f8554... F2FS Initial
 
 	/* Only from the recovery routine */
 	if (is_inode_flag_set(F2FS_I(inode), FI_DELAY_IPUT)) {
@@ -796,30 +648,6 @@ void remove_dirty_dir_inode(struct inode *inode)
 	}
 }
 
-<<<<<<< HEAD
-=======
-struct inode *check_dirty_dir_inode(struct f2fs_sb_info *sbi, nid_t ino)
-{
-
-	struct list_head *this, *head;
-	struct inode *inode = NULL;
-
-	spin_lock(&sbi->dir_inode_lock);
-
-	head = &sbi->dir_inode_list;
-	list_for_each(this, head) {
-		struct dir_inode_entry *entry;
-		entry = list_entry(this, struct dir_inode_entry, list);
-		if (entry->inode->i_ino == ino) {
-			inode = entry->inode;
-			break;
-		}
-	}
-	spin_unlock(&sbi->dir_inode_lock);
-	return inode;
-}
-
->>>>>>> 29f8554... F2FS Initial
 void sync_dirty_dir_inodes(struct f2fs_sb_info *sbi)
 {
 	struct list_head *head;
@@ -837,11 +665,7 @@ retry:
 	inode = igrab(entry->inode);
 	spin_unlock(&sbi->dir_inode_lock);
 	if (inode) {
-<<<<<<< HEAD
 		filemap_fdatawrite(inode->i_mapping);
-=======
-		filemap_flush(inode->i_mapping);
->>>>>>> 29f8554... F2FS Initial
 		iput(inode);
 	} else {
 		/*
@@ -923,15 +747,12 @@ static void do_checkpoint(struct f2fs_sb_info *sbi, bool is_umount)
 	void *kaddr;
 	int i;
 
-<<<<<<< HEAD
 	/*
 	 * This avoids to conduct wrong roll-forward operations and uses
 	 * metapages, so should be called prior to sync_meta_pages below.
 	 */
 	discard_next_dnode(sbi);
 
-=======
->>>>>>> 29f8554... F2FS Initial
 	/* Flush all the NAT/SIT pages */
 	while (get_pages(sbi, F2FS_DIRTY_META))
 		sync_meta_pages(sbi, META, LONG_MAX);
@@ -1085,10 +906,7 @@ void write_checkpoint(struct f2fs_sb_info *sbi, bool is_umount)
 	unblock_operations(sbi);
 	mutex_unlock(&sbi->cp_mutex);
 
-<<<<<<< HEAD
 	stat_inc_cp_count(sbi->stat_info);
-=======
->>>>>>> 29f8554... F2FS Initial
 	trace_f2fs_write_checkpoint(sbi->sb, is_umount, "finish checkpoint");
 }
 
@@ -1110,19 +928,11 @@ void init_orphan_info(struct f2fs_sb_info *sbi)
 int __init create_checkpoint_caches(void)
 {
 	orphan_entry_slab = f2fs_kmem_cache_create("f2fs_orphan_entry",
-<<<<<<< HEAD
 			sizeof(struct orphan_inode_entry));
 	if (!orphan_entry_slab)
 		return -ENOMEM;
 	inode_entry_slab = f2fs_kmem_cache_create("f2fs_dirty_dir_entry",
 			sizeof(struct dir_inode_entry));
-=======
-			sizeof(struct orphan_inode_entry), NULL);
-	if (!orphan_entry_slab)
-		return -ENOMEM;
-	inode_entry_slab = f2fs_kmem_cache_create("f2fs_dirty_dir_entry",
-			sizeof(struct dir_inode_entry), NULL);
->>>>>>> 29f8554... F2FS Initial
 	if (!inode_entry_slab) {
 		kmem_cache_destroy(orphan_entry_slab);
 		return -ENOMEM;

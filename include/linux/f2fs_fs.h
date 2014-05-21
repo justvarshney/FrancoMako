@@ -183,11 +183,7 @@ struct f2fs_inode {
 	__le32 i_pino;			/* parent inode number */
 	__le32 i_namelen;		/* file name length */
 	__u8 i_name[F2FS_NAME_LEN];	/* file name for SPOR */
-<<<<<<< HEAD
 	__u8 i_dir_level;		/* dentry_level for large dir */
-=======
-	__u8 i_reserved2;		/* for backward compatibility */
->>>>>>> 29f8554... F2FS Initial
 
 	struct f2fs_extent i_ext;	/* caching a largest extent */
 

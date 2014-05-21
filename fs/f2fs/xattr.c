@@ -276,11 +276,7 @@ static void *read_all_xattrs(struct inode *inode, struct page *ipage)
 
 	inline_size = inline_xattr_size(inode);
 
-<<<<<<< HEAD
 	txattr_addr = kzalloc(inline_size + size, GFP_F2FS_ZERO);
-=======
-	txattr_addr = kzalloc(inline_size + size, GFP_KERNEL);
->>>>>>> 29f8554... F2FS Initial
 	if (!txattr_addr)
 		return NULL;
 
@@ -412,11 +408,8 @@ int f2fs_getxattr(struct inode *inode, int name_index, const char *name,
 	if (name == NULL)
 		return -EINVAL;
 	name_len = strlen(name);
-<<<<<<< HEAD
 	if (name_len > F2FS_NAME_LEN)
 		return -ERANGE;
-=======
->>>>>>> 29f8554... F2FS Initial
 
 	base_addr = read_all_xattrs(inode, NULL);
 	if (!base_addr)
@@ -600,14 +593,10 @@ int f2fs_setxattr(struct inode *inode, int name_index, const char *name,
 	f2fs_balance_fs(sbi);
 
 	f2fs_lock_op(sbi);
-<<<<<<< HEAD
 	/* protect xattr_ver */
 	down_write(&F2FS_I(inode)->i_sem);
 	err = __f2fs_setxattr(inode, name_index, name, value, value_len, ipage);
 	up_write(&F2FS_I(inode)->i_sem);
-=======
-	err = __f2fs_setxattr(inode, name_index, name, value, value_len, ipage);
->>>>>>> 29f8554... F2FS Initial
 	f2fs_unlock_op(sbi);
 
 	return err;
