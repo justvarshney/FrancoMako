@@ -277,14 +277,10 @@ static void *read_all_xattrs(struct inode *inode, struct page *ipage)
 	inline_size = inline_xattr_size(inode);
 
 <<<<<<< HEAD
-<<<<<<< HEAD
 	txattr_addr = kzalloc(inline_size + size, GFP_F2FS_ZERO);
 =======
 	txattr_addr = kzalloc(inline_size + size, GFP_KERNEL);
 >>>>>>> 29f8554... F2FS Initial
-=======
-	txattr_addr = kzalloc(inline_size + size, GFP_F2FS_ZERO);
->>>>>>> 21c37c1... F2FS: latest commits
 	if (!txattr_addr)
 		return NULL;
 
@@ -417,15 +413,10 @@ int f2fs_getxattr(struct inode *inode, int name_index, const char *name,
 		return -EINVAL;
 	name_len = strlen(name);
 <<<<<<< HEAD
-<<<<<<< HEAD
 	if (name_len > F2FS_NAME_LEN)
 		return -ERANGE;
 =======
 >>>>>>> 29f8554... F2FS Initial
-=======
-	if (name_len > F2FS_NAME_LEN)
-		return -ERANGE;
->>>>>>> 21c37c1... F2FS: latest commits
 
 	base_addr = read_all_xattrs(inode, NULL);
 	if (!base_addr)
@@ -610,7 +601,6 @@ int f2fs_setxattr(struct inode *inode, int name_index, const char *name,
 
 	f2fs_lock_op(sbi);
 <<<<<<< HEAD
-<<<<<<< HEAD
 	/* protect xattr_ver */
 	down_write(&F2FS_I(inode)->i_sem);
 	err = __f2fs_setxattr(inode, name_index, name, value, value_len, ipage);
@@ -618,12 +608,6 @@ int f2fs_setxattr(struct inode *inode, int name_index, const char *name,
 =======
 	err = __f2fs_setxattr(inode, name_index, name, value, value_len, ipage);
 >>>>>>> 29f8554... F2FS Initial
-=======
-	/* protect xattr_ver */
-	down_write(&F2FS_I(inode)->i_sem);
-	err = __f2fs_setxattr(inode, name_index, name, value, value_len, ipage);
-	up_write(&F2FS_I(inode)->i_sem);
->>>>>>> 21c37c1... F2FS: latest commits
 	f2fs_unlock_op(sbi);
 
 	return err;

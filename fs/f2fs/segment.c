@@ -14,13 +14,9 @@
 #include <linux/blkdev.h>
 #include <linux/prefetch.h>
 <<<<<<< HEAD
-<<<<<<< HEAD
 #include <linux/kthread.h>
 =======
 >>>>>>> 29f8554... F2FS Initial
-=======
-#include <linux/kthread.h>
->>>>>>> 21c37c1... F2FS: latest commits
 #include <linux/vmalloc.h>
 #include <linux/swap.h>
 
@@ -33,13 +29,9 @@
 
 static struct kmem_cache *discard_entry_slab;
 <<<<<<< HEAD
-<<<<<<< HEAD
 static struct kmem_cache *flush_cmd_slab;
 =======
 >>>>>>> 29f8554... F2FS Initial
-=======
-static struct kmem_cache *flush_cmd_slab;
->>>>>>> 21c37c1... F2FS: latest commits
 
 /*
  * __reverse_ffs is copied from include/asm-generic/bitops/__ffs.h since
@@ -212,9 +204,6 @@ void f2fs_balance_fs_bg(struct f2fs_sb_info *sbi)
 }
 
 <<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 21c37c1... F2FS: latest commits
 int issue_flush_thread(void *data)
 {
 	struct f2fs_sb_info *sbi = data;
@@ -281,11 +270,8 @@ int f2fs_issue_flush(struct f2fs_sb_info *sbi)
 	return ret;
 }
 
-<<<<<<< HEAD
 =======
 >>>>>>> 29f8554... F2FS Initial
-=======
->>>>>>> 21c37c1... F2FS: latest commits
 static void __locate_dirty_segment(struct f2fs_sb_info *sbi, unsigned int segno,
 		enum dirty_type dirty_type)
 {
@@ -359,19 +345,14 @@ static void locate_dirty_segment(struct f2fs_sb_info *sbi, unsigned int segno)
 }
 
 <<<<<<< HEAD
-<<<<<<< HEAD
 static int f2fs_issue_discard(struct f2fs_sb_info *sbi,
 =======
 static void f2fs_issue_discard(struct f2fs_sb_info *sbi,
 >>>>>>> 29f8554... F2FS Initial
-=======
-static int f2fs_issue_discard(struct f2fs_sb_info *sbi,
->>>>>>> 21c37c1... F2FS: latest commits
 				block_t blkstart, block_t blklen)
 {
 	sector_t start = SECTOR_FROM_BLOCK(sbi, blkstart);
 	sector_t len = SECTOR_FROM_BLOCK(sbi, blklen);
-<<<<<<< HEAD
 <<<<<<< HEAD
 	trace_f2fs_issue_discard(sbi->sb, blkstart, blklen);
 	return blkdev_issue_discard(sbi->sb->s_bdev, start, len, GFP_NOFS, 0);
@@ -392,23 +373,6 @@ void discard_next_dnode(struct f2fs_sb_info *sbi)
 	blkdev_issue_discard(sbi->sb->s_bdev, start, len, GFP_NOFS, 0);
 	trace_f2fs_issue_discard(sbi->sb, blkstart, blklen);
 >>>>>>> 29f8554... F2FS Initial
-=======
-	trace_f2fs_issue_discard(sbi->sb, blkstart, blklen);
-	return blkdev_issue_discard(sbi->sb->s_bdev, start, len, GFP_NOFS, 0);
-}
-
-void discard_next_dnode(struct f2fs_sb_info *sbi)
-{
-	struct curseg_info *curseg = CURSEG_I(sbi, CURSEG_WARM_NODE);
-	block_t blkaddr = NEXT_FREE_BLKADDR(sbi, curseg);
-
-	if (f2fs_issue_discard(sbi, blkaddr, 1)) {
-		struct page *page = grab_meta_page(sbi, blkaddr);
-		/* zero-filled page */
-		set_page_dirty(page);
-		f2fs_put_page(page, 1);
-	}
->>>>>>> 21c37c1... F2FS: latest commits
 }
 
 static void add_discard_addrs(struct f2fs_sb_info *sbi,
@@ -476,15 +440,11 @@ void clear_prefree_segments(struct f2fs_sb_info *sbi)
 {
 	struct list_head *head = &(SM_I(sbi)->discard_list);
 <<<<<<< HEAD
-<<<<<<< HEAD
 	struct discard_entry *entry, *this;
 =======
 	struct list_head *this, *next;
 	struct discard_entry *entry;
 >>>>>>> 29f8554... F2FS Initial
-=======
-	struct discard_entry *entry, *this;
->>>>>>> 21c37c1... F2FS: latest commits
 	struct dirty_seglist_info *dirty_i = DIRTY_I(sbi);
 	unsigned long *prefree_map = dirty_i->dirty_segmap[PRE];
 	unsigned int total_segs = TOTAL_SEGS(sbi);
@@ -514,15 +474,11 @@ void clear_prefree_segments(struct f2fs_sb_info *sbi)
 
 	/* send small discards */
 <<<<<<< HEAD
-<<<<<<< HEAD
 	list_for_each_entry_safe(entry, this, head, list) {
 =======
 	list_for_each_safe(this, next, head) {
 		entry = list_entry(this, struct discard_entry, list);
 >>>>>>> 29f8554... F2FS Initial
-=======
-	list_for_each_entry_safe(entry, this, head, list) {
->>>>>>> 21c37c1... F2FS: latest commits
 		f2fs_issue_discard(sbi, entry->blkaddr, entry->len);
 		list_del(&entry->list);
 		SM_I(sbi)->nr_discards -= entry->len;
@@ -558,14 +514,10 @@ static void update_sit_entry(struct f2fs_sb_info *sbi, block_t blkaddr, int del)
 	se = get_seg_entry(sbi, segno);
 	new_vblocks = se->valid_blocks + del;
 <<<<<<< HEAD
-<<<<<<< HEAD
 	offset = GET_BLKOFF_FROM_SEG0(sbi, blkaddr);
 =======
 	offset = GET_SEGOFF_FROM_SEG0(sbi, blkaddr) & (sbi->blocks_per_seg - 1);
 >>>>>>> 29f8554... F2FS Initial
-=======
-	offset = GET_BLKOFF_FROM_SEG0(sbi, blkaddr);
->>>>>>> 21c37c1... F2FS: latest commits
 
 	if (new_vblocks < 0 || new_vblocks > sbi->blocks_per_seg ||
 	    (new_vblocks >> (sizeof(unsigned short) << 3)))
@@ -1181,15 +1133,11 @@ void recover_data_page(struct f2fs_sb_info *sbi,
 	}
 
 <<<<<<< HEAD
-<<<<<<< HEAD
 	curseg->next_blkoff = GET_BLKOFF_FROM_SEG0(sbi, new_blkaddr);
 =======
 	curseg->next_blkoff = GET_SEGOFF_FROM_SEG0(sbi, new_blkaddr) &
 					(sbi->blocks_per_seg - 1);
 >>>>>>> 29f8554... F2FS Initial
-=======
-	curseg->next_blkoff = GET_BLKOFF_FROM_SEG0(sbi, new_blkaddr);
->>>>>>> 21c37c1... F2FS: latest commits
 	__add_sum_entry(sbi, type, sum);
 
 	refresh_sit_entry(sbi, old_blkaddr, new_blkaddr);
@@ -1228,15 +1176,11 @@ void rewrite_node_page(struct f2fs_sb_info *sbi,
 		change_curseg(sbi, type, true);
 	}
 <<<<<<< HEAD
-<<<<<<< HEAD
 	curseg->next_blkoff = GET_BLKOFF_FROM_SEG0(sbi, new_blkaddr);
 =======
 	curseg->next_blkoff = GET_SEGOFF_FROM_SEG0(sbi, new_blkaddr) &
 					(sbi->blocks_per_seg - 1);
 >>>>>>> 29f8554... F2FS Initial
-=======
-	curseg->next_blkoff = GET_BLKOFF_FROM_SEG0(sbi, new_blkaddr);
->>>>>>> 21c37c1... F2FS: latest commits
 	__add_sum_entry(sbi, type, sum);
 
 	/* change the current log to the next block addr in advance */
@@ -1245,15 +1189,11 @@ void rewrite_node_page(struct f2fs_sb_info *sbi,
 		change_curseg(sbi, type, true);
 	}
 <<<<<<< HEAD
-<<<<<<< HEAD
 	curseg->next_blkoff = GET_BLKOFF_FROM_SEG0(sbi, next_blkaddr);
 =======
 	curseg->next_blkoff = GET_SEGOFF_FROM_SEG0(sbi, next_blkaddr) &
 					(sbi->blocks_per_seg - 1);
 >>>>>>> 29f8554... F2FS Initial
-=======
-	curseg->next_blkoff = GET_BLKOFF_FROM_SEG0(sbi, next_blkaddr);
->>>>>>> 21c37c1... F2FS: latest commits
 
 	/* rewrite node page */
 	set_page_writeback(page);
@@ -1267,9 +1207,6 @@ void rewrite_node_page(struct f2fs_sb_info *sbi,
 }
 
 <<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 21c37c1... F2FS: latest commits
 static inline bool is_merged_page(struct f2fs_sb_info *sbi,
 					struct page *page, enum page_type type)
 {
@@ -1294,27 +1231,19 @@ out:
 	return false;
 }
 
-<<<<<<< HEAD
 =======
 >>>>>>> 29f8554... F2FS Initial
-=======
->>>>>>> 21c37c1... F2FS: latest commits
 void f2fs_wait_on_page_writeback(struct page *page,
 				enum page_type type)
 {
 	struct f2fs_sb_info *sbi = F2FS_SB(page->mapping->host->i_sb);
 	if (PageWriteback(page)) {
 <<<<<<< HEAD
-<<<<<<< HEAD
 		if (is_merged_page(sbi, page, type))
 			f2fs_submit_merged_bio(sbi, type, WRITE);
 =======
 		f2fs_submit_merged_bio(sbi, type, WRITE);
 >>>>>>> 29f8554... F2FS Initial
-=======
-		if (is_merged_page(sbi, page, type))
-			f2fs_submit_merged_bio(sbi, type, WRITE);
->>>>>>> 21c37c1... F2FS: latest commits
 		wait_on_page_writeback(page);
 	}
 }
@@ -1424,14 +1353,10 @@ static int read_normal_summaries(struct f2fs_sb_info *sbi, int type)
 			}
 		} else {
 <<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 21c37c1... F2FS: latest commits
 			int err;
 
 			err = restore_node_summary(sbi, segno, sum);
 			if (err) {
-<<<<<<< HEAD
 				f2fs_put_page(new, 1);
 				return err;
 =======
@@ -1439,10 +1364,6 @@ static int read_normal_summaries(struct f2fs_sb_info *sbi, int type)
 				f2fs_put_page(new, 1);
 				return -EINVAL;
 >>>>>>> 29f8554... F2FS Initial
-=======
-				f2fs_put_page(new, 1);
-				return err;
->>>>>>> 21c37c1... F2FS: latest commits
 			}
 		}
 	}
@@ -1464,13 +1385,9 @@ static int restore_curseg_summaries(struct f2fs_sb_info *sbi)
 {
 	int type = CURSEG_HOT_DATA;
 <<<<<<< HEAD
-<<<<<<< HEAD
 	int err;
 =======
 >>>>>>> 29f8554... F2FS Initial
-=======
-	int err;
->>>>>>> 21c37c1... F2FS: latest commits
 
 	if (is_set_ckpt_flags(F2FS_CKPT(sbi), CP_COMPACT_SUM_FLAG)) {
 		/* restore for compacted data summary */
@@ -1480,23 +1397,17 @@ static int restore_curseg_summaries(struct f2fs_sb_info *sbi)
 	}
 
 <<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 21c37c1... F2FS: latest commits
 	for (; type <= CURSEG_COLD_NODE; type++) {
 		err = read_normal_summaries(sbi, type);
 		if (err)
 			return err;
 	}
 
-<<<<<<< HEAD
 =======
 	for (; type <= CURSEG_COLD_NODE; type++)
 		if (read_normal_summaries(sbi, type))
 			return -EINVAL;
 >>>>>>> 29f8554... F2FS Initial
-=======
->>>>>>> 21c37c1... F2FS: latest commits
 	return 0;
 }
 
@@ -1880,7 +1791,6 @@ static int build_curseg(struct f2fs_sb_info *sbi)
 }
 
 <<<<<<< HEAD
-<<<<<<< HEAD
 =======
 static int ra_sit_pages(struct f2fs_sb_info *sbi, int start, int nrpages)
 {
@@ -1924,8 +1834,6 @@ repeat:
 }
 
 >>>>>>> 29f8554... F2FS Initial
-=======
->>>>>>> 21c37c1... F2FS: latest commits
 static void build_sit_entries(struct f2fs_sb_info *sbi)
 {
 	struct sit_info *sit_i = SIT_I(sbi);
@@ -1938,14 +1846,10 @@ static void build_sit_entries(struct f2fs_sb_info *sbi)
 
 	do {
 <<<<<<< HEAD
-<<<<<<< HEAD
 		readed = ra_meta_pages(sbi, start_blk, nrpages, META_SIT);
 =======
 		readed = ra_sit_pages(sbi, start_blk, nrpages);
 >>>>>>> 29f8554... F2FS Initial
-=======
-		readed = ra_meta_pages(sbi, start_blk, nrpages, META_SIT);
->>>>>>> 21c37c1... F2FS: latest commits
 
 		start = start_blk * sit_i->sents_per_block;
 		end = (start_blk + readed) * sit_i->sents_per_block;
@@ -2092,13 +1996,9 @@ int build_segment_manager(struct f2fs_sb_info *sbi)
 	struct f2fs_super_block *raw_super = F2FS_RAW_SUPER(sbi);
 	struct f2fs_checkpoint *ckpt = F2FS_CKPT(sbi);
 <<<<<<< HEAD
-<<<<<<< HEAD
 	dev_t dev = sbi->sb->s_bdev->bd_dev;
 =======
 >>>>>>> 29f8554... F2FS Initial
-=======
-	dev_t dev = sbi->sb->s_bdev->bd_dev;
->>>>>>> 21c37c1... F2FS: latest commits
 	struct f2fs_sm_info *sm_info;
 	int err;
 
@@ -2118,16 +2018,11 @@ int build_segment_manager(struct f2fs_sb_info *sbi)
 	sm_info->main_segments = le32_to_cpu(raw_super->segment_count_main);
 	sm_info->ssa_blkaddr = le32_to_cpu(raw_super->ssa_blkaddr);
 <<<<<<< HEAD
-<<<<<<< HEAD
 	sm_info->rec_prefree_segments = sm_info->main_segments *
 					DEF_RECLAIM_PREFREE_SEGMENTS / 100;
 =======
 	sm_info->rec_prefree_segments = DEF_RECLAIM_PREFREE_SEGMENTS;
 >>>>>>> 29f8554... F2FS Initial
-=======
-	sm_info->rec_prefree_segments = sm_info->main_segments *
-					DEF_RECLAIM_PREFREE_SEGMENTS / 100;
->>>>>>> 21c37c1... F2FS: latest commits
 	sm_info->ipu_policy = F2FS_IPU_DISABLE;
 	sm_info->min_ipu_util = DEF_MIN_IPU_UTIL;
 
@@ -2136,9 +2031,6 @@ int build_segment_manager(struct f2fs_sb_info *sbi)
 	sm_info->max_discards = 0;
 
 <<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 21c37c1... F2FS: latest commits
 	if (test_opt(sbi, FLUSH_MERGE) && !f2fs_readonly(sbi->sb)) {
 		spin_lock_init(&sm_info->issue_lock);
 		init_waitqueue_head(&sm_info->flush_wait_queue);
@@ -2148,11 +2040,8 @@ int build_segment_manager(struct f2fs_sb_info *sbi)
 			return PTR_ERR(sm_info->f2fs_issue_flush);
 	}
 
-<<<<<<< HEAD
 =======
 >>>>>>> 29f8554... F2FS Initial
-=======
->>>>>>> 21c37c1... F2FS: latest commits
 	err = build_sit_info(sbi);
 	if (err)
 		return err;
@@ -2262,15 +2151,10 @@ void destroy_segment_manager(struct f2fs_sb_info *sbi)
 	if (!sm_info)
 		return;
 <<<<<<< HEAD
-<<<<<<< HEAD
 	if (sm_info->f2fs_issue_flush)
 		kthread_stop(sm_info->f2fs_issue_flush);
 =======
 >>>>>>> 29f8554... F2FS Initial
-=======
-	if (sm_info->f2fs_issue_flush)
-		kthread_stop(sm_info->f2fs_issue_flush);
->>>>>>> 21c37c1... F2FS: latest commits
 	destroy_dirty_segmap(sbi);
 	destroy_curseg(sbi);
 	destroy_free_segmap(sbi);
@@ -2282,7 +2166,6 @@ void destroy_segment_manager(struct f2fs_sb_info *sbi)
 int __init create_segment_manager_caches(void)
 {
 	discard_entry_slab = f2fs_kmem_cache_create("discard_entry",
-<<<<<<< HEAD
 <<<<<<< HEAD
 			sizeof(struct discard_entry));
 	if (!discard_entry_slab)
@@ -2298,17 +2181,6 @@ int __init create_segment_manager_caches(void)
 	if (!discard_entry_slab)
 		return -ENOMEM;
 >>>>>>> 29f8554... F2FS Initial
-=======
-			sizeof(struct discard_entry));
-	if (!discard_entry_slab)
-		return -ENOMEM;
-	flush_cmd_slab = f2fs_kmem_cache_create("flush_command",
-			sizeof(struct flush_cmd));
-	if (!flush_cmd_slab) {
-		kmem_cache_destroy(discard_entry_slab);
-		return -ENOMEM;
-	}
->>>>>>> 21c37c1... F2FS: latest commits
 	return 0;
 }
 
@@ -2316,11 +2188,7 @@ void destroy_segment_manager_caches(void)
 {
 	kmem_cache_destroy(discard_entry_slab);
 <<<<<<< HEAD
-<<<<<<< HEAD
 	kmem_cache_destroy(flush_cmd_slab);
 =======
 >>>>>>> 29f8554... F2FS Initial
-=======
-	kmem_cache_destroy(flush_cmd_slab);
->>>>>>> 21c37c1... F2FS: latest commits
 }

@@ -527,7 +527,6 @@ static void move_data_page(struct inode *inode, struct page *page, int gc_type)
 		set_cold_data(page);
 	} else {
 <<<<<<< HEAD
-<<<<<<< HEAD
 		f2fs_wait_on_page_writeback(page, DATA);
 
 		if (clear_page_dirty_for_io(page))
@@ -535,17 +534,14 @@ static void move_data_page(struct inode *inode, struct page *page, int gc_type)
 =======
 		struct f2fs_sb_info *sbi = F2FS_SB(inode->i_sb);
 
-=======
->>>>>>> 21c37c1... F2FS: latest commits
 		f2fs_wait_on_page_writeback(page, DATA);
 
-		if (clear_page_dirty_for_io(page))
+		if (clear_page_dirty_for_io(page) &&
+			S_ISDIR(inode->i_mode)) {
+			dec_page_count(sbi, F2FS_DIRTY_DENTS);
 			inode_dec_dirty_dents(inode);
-<<<<<<< HEAD
 		}
 >>>>>>> 29f8554... F2FS Initial
-=======
->>>>>>> 21c37c1... F2FS: latest commits
 		set_cold_data(page);
 		do_write_data_page(page, &fio);
 		clear_cold_data(page);
@@ -708,15 +704,10 @@ gc_more:
 	if (unlikely(!(sbi->sb->s_flags & MS_ACTIVE)))
 		goto stop;
 <<<<<<< HEAD
-<<<<<<< HEAD
 	if (unlikely(is_set_ckpt_flags(F2FS_CKPT(sbi), CP_ERROR_FLAG)))
 		goto stop;
 =======
 >>>>>>> 29f8554... F2FS Initial
-=======
-	if (unlikely(is_set_ckpt_flags(F2FS_CKPT(sbi), CP_ERROR_FLAG)))
-		goto stop;
->>>>>>> 21c37c1... F2FS: latest commits
 
 	if (gc_type == BG_GC && has_not_enough_free_secs(sbi, nfree)) {
 		gc_type = FG_GC;
@@ -728,19 +719,13 @@ gc_more:
 	ret = 0;
 
 <<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 21c37c1... F2FS: latest commits
 	/* readahead multi ssa blocks those have contiguous address */
 	if (sbi->segs_per_sec > 1)
 		ra_meta_pages(sbi, GET_SUM_BLOCK(sbi, segno), sbi->segs_per_sec,
 								META_SSA);
 
-<<<<<<< HEAD
 =======
 >>>>>>> 29f8554... F2FS Initial
-=======
->>>>>>> 21c37c1... F2FS: latest commits
 	for (i = 0; i < sbi->segs_per_sec; i++)
 		do_garbage_collect(sbi, segno + i, &ilist, gc_type);
 
@@ -771,14 +756,10 @@ int __init create_gc_caches(void)
 {
 	winode_slab = f2fs_kmem_cache_create("f2fs_gc_inodes",
 <<<<<<< HEAD
-<<<<<<< HEAD
 			sizeof(struct inode_entry));
 =======
 			sizeof(struct inode_entry), NULL);
 >>>>>>> 29f8554... F2FS Initial
-=======
-			sizeof(struct inode_entry));
->>>>>>> 21c37c1... F2FS: latest commits
 	if (!winode_slab)
 		return -ENOMEM;
 	return 0;
