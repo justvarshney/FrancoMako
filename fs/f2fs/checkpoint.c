@@ -35,7 +35,6 @@ struct page *grab_meta_page(struct f2fs_sb_info *sbi, pgoff_t index)
 repeat:
 <<<<<<< HEAD
 <<<<<<< HEAD
-<<<<<<< HEAD
 	page = grab_cache_page_write_begin(mapping, index, AOP_FLAG_NOFS);
 =======
 	page = grab_cache_page(mapping, index);
@@ -43,14 +42,10 @@ repeat:
 =======
 	page = grab_cache_page_write_begin(mapping, index, AOP_FLAG_NOFS);
 >>>>>>> 21c37c1... F2FS: latest commits
-=======
-	page = grab_cache_page(mapping, index);
->>>>>>> 41ca32c... F2FS: upstream updates
 	if (!page) {
 		cond_resched();
 		goto repeat;
 	}
-<<<<<<< HEAD
 
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -60,9 +55,6 @@ repeat:
 >>>>>>> 29f8554... F2FS Initial
 =======
 >>>>>>> 21c37c1... F2FS: latest commits
-=======
-	f2fs_wait_on_page_writeback(page, META);
->>>>>>> 41ca32c... F2FS: upstream updates
 	SetPageUptodate(page);
 	return page;
 }
@@ -192,7 +184,6 @@ static int f2fs_write_meta_page(struct page *page,
 
 <<<<<<< HEAD
 <<<<<<< HEAD
-<<<<<<< HEAD
 	if (unlikely(sbi->por_doing))
 		goto redirty_out;
 	if (wbc->for_reclaim)
@@ -210,10 +201,6 @@ no_write:
 	if (unlikely(sbi->por_doing ||
 			is_set_ckpt_flags(F2FS_CKPT(sbi), CP_ERROR_FLAG)))
 =======
-=======
-	trace_f2fs_writepage(page, META);
-
->>>>>>> 41ca32c... F2FS: upstream updates
 	if (unlikely(sbi->por_doing))
 >>>>>>> 21c37c1... F2FS: latest commits
 		goto redirty_out;
@@ -257,8 +244,6 @@ static int f2fs_write_meta_pages(struct address_space *mapping,
 <<<<<<< HEAD
 <<<<<<< HEAD
 	long diff, written;
-
-	trace_f2fs_writepages(mapping->host, wbc, META);
 
 	/* collect a number of dirty meta pages and write together */
 	if (wbc->for_kupdate ||

@@ -34,15 +34,12 @@
 static struct kmem_cache *discard_entry_slab;
 <<<<<<< HEAD
 <<<<<<< HEAD
-<<<<<<< HEAD
 static struct kmem_cache *flush_cmd_slab;
 =======
 >>>>>>> 29f8554... F2FS Initial
 =======
 static struct kmem_cache *flush_cmd_slab;
 >>>>>>> 21c37c1... F2FS: latest commits
-=======
->>>>>>> 41ca32c... F2FS: upstream updates
 
 /*
  * __reverse_ffs is copied from include/asm-generic/bitops/__ffs.h since
@@ -220,12 +217,9 @@ void f2fs_balance_fs_bg(struct f2fs_sb_info *sbi)
 >>>>>>> 21c37c1... F2FS: latest commits
 int issue_flush_thread(void *data)
 {
-#define test 0
 	struct f2fs_sb_info *sbi = data;
 	struct f2fs_sm_info *sm_i = SM_I(sbi);
 	wait_queue_head_t *q = &sm_i->flush_wait_queue;
-	/*struct flush_cmd_control *fcc = SM_I(sbi)->cmd_control_info;
-	wait_queue_head_t *q = &fcc->flush_wait_queue;*/
 repeat:
 	if (kthread_should_stop())
 		return 0;
@@ -261,28 +255,30 @@ repeat:
 int f2fs_issue_flush(struct f2fs_sb_info *sbi)
 {
 	struct f2fs_sm_info *sm_i = SM_I(sbi);
-	struct flush_cmd cmd;
+	struct flush_cmd *cmd;
+	int ret;
 
 	if (!test_opt(sbi, FLUSH_MERGE))
 		return blkdev_issue_flush(sbi->sb->s_bdev, GFP_KERNEL, NULL);
 
-	init_completion(&cmd.wait);
-	cmd.next = NULL;
+	cmd = f2fs_kmem_cache_alloc(flush_cmd_slab, GFP_ATOMIC | __GFP_ZERO);
+	init_completion(&cmd->wait);
 
 	spin_lock(&sm_i->issue_lock);
 	if (sm_i->issue_list)
-		sm_i->issue_tail->next = &cmd;
+		sm_i->issue_tail->next = cmd;
 	else
-		sm_i->issue_list = &cmd;
-	sm_i->issue_tail = &cmd;
+		sm_i->issue_list = cmd;
+	sm_i->issue_tail = cmd;
 	spin_unlock(&sm_i->issue_lock);
 
 	if (!sm_i->dispatch_list)
 		wake_up(&sm_i->flush_wait_queue);
 
-	wait_for_completion(&cmd.wait);
-
-	return cmd.ret;
+	wait_for_completion(&cmd->wait);
+	ret = cmd->ret;
+	kmem_cache_free(flush_cmd_slab, cmd);
+	return ret;
 }
 
 <<<<<<< HEAD
@@ -2291,7 +2287,6 @@ int __init create_segment_manager_caches(void)
 			sizeof(struct discard_entry));
 	if (!discard_entry_slab)
 		return -ENOMEM;
-<<<<<<< HEAD
 	flush_cmd_slab = f2fs_kmem_cache_create("flush_command",
 			sizeof(struct flush_cmd));
 	if (!flush_cmd_slab) {
@@ -2314,8 +2309,6 @@ int __init create_segment_manager_caches(void)
 		return -ENOMEM;
 	}
 >>>>>>> 21c37c1... F2FS: latest commits
-=======
->>>>>>> 41ca32c... F2FS: upstream updates
 	return 0;
 }
 
@@ -2324,13 +2317,10 @@ void destroy_segment_manager_caches(void)
 	kmem_cache_destroy(discard_entry_slab);
 <<<<<<< HEAD
 <<<<<<< HEAD
-<<<<<<< HEAD
 	kmem_cache_destroy(flush_cmd_slab);
 =======
 >>>>>>> 29f8554... F2FS Initial
 =======
 	kmem_cache_destroy(flush_cmd_slab);
 >>>>>>> 21c37c1... F2FS: latest commits
-=======
->>>>>>> 41ca32c... F2FS: upstream updates
 }
